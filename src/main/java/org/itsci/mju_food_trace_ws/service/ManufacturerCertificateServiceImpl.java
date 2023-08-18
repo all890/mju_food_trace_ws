@@ -20,7 +20,6 @@ import java.util.Map;
 @Service
 public class ManufacturerCertificateServiceImpl implements ManufacturerCertificateService {
 
-    //Manufacturer certificate image path
     private final String MANUFACTURER_CERT_FOLDER_PATH = "C:/img/mncert/";
 
     @Autowired
