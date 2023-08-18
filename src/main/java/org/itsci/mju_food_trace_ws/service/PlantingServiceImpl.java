@@ -73,12 +73,12 @@ public class PlantingServiceImpl implements PlantingService {
         int squareYards = Integer.parseInt(map.get("squareYards"));
         int rai = Integer.parseInt(map.get("rai"));
         String username = map.get("username");
-        //String ptPrevBlockHash = map.get("ptPrevBlockHash");
+        String ptPrevBlockHash = "0";
         //String ptCurrBlockHash = map.get("ptCurrBlockHash");
 
         Farmer farmer = farmerRepository.getFarmerByUser_Username(username);
 
-        planting = new Planting(plantingId,plantName,plantDate,plantingImg,bioextract,approxHarvDate,plantingMethod,netQuantity,netQuantityUnit,squareMeters,squareYards,rai,farmer);
+        planting = new Planting(plantingId,plantName,plantDate,plantingImg,bioextract,approxHarvDate,plantingMethod,netQuantity,netQuantityUnit,squareMeters,squareYards,rai, ptPrevBlockHash,farmer);
         return plantingRepository.save(planting);
     }
 
