@@ -9,4 +9,5 @@ public interface RawMaterialShippingService {
 
 
     List<RawMaterialShipping> getListAllSentAgriByUsername(String username);
+    RawMaterialShipping getRawMaterialShippingById(String rawMatShpId);
 }

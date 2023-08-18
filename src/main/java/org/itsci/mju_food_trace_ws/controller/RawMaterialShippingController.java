@@ -8,6 +8,7 @@ import org.itsci.mju_food_trace_ws.service.RawMaterialShippingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,7 @@ public class RawMaterialShippingController {
     private RawMaterialShippingService rawMaterialShippingService;
 
     @RequestMapping("/listallsentagri/{username}")
-    public ResponseEntity getListAllSentAgri (@PathVariable("username") String username) {
+    public ResponseEntity getListAllSentAgri(@PathVariable("username") String username) {
 
         try {
             List<RawMaterialShipping> rawMaterialShippings = rawMaterialShippingService.getListAllSentAgriByUsername(username);
@@ -33,4 +34,15 @@ public class RawMaterialShippingController {
         }
     }
 
+    @GetMapping("/getrmsdetails/{rawMatShpId}")
+    public ResponseEntity getRawMaterialShippingDetails(@PathVariable("rawMatShpId") String rawMatShpId) {
+        try {
+            RawMaterialShipping rawMaterialShipping = rawMaterialShippingService.getRawMaterialShippingById(rawMatShpId);
+            return new ResponseEntity<>(rawMaterialShipping, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get planting's details", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }

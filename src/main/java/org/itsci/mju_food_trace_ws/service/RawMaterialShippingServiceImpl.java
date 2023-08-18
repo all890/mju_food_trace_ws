@@ -11,8 +11,13 @@ import java.util.List;
 public class RawMaterialShippingServiceImpl implements RawMaterialShippingService{
   @Autowired
   private RawMaterialShippingRepository rawMaterialShippingRepository;
-    @Override
-    public List<RawMaterialShipping> getListAllSentAgriByUsername(String username) {
-        return rawMaterialShippingRepository.getRawMaterialShippingsByManufacturer_User_Username(username);
-    }
+  @Override
+  public List<RawMaterialShipping> getListAllSentAgriByUsername(String username) {
+    return rawMaterialShippingRepository.getRawMaterialShippingsByManufacturer_User_Username(username);
+  }
+
+  @Override
+  public RawMaterialShipping getRawMaterialShippingById(String rawMatShpId) {
+    return rawMaterialShippingRepository.getReferenceById(rawMatShpId);
+  }
 }
