@@ -68,12 +68,13 @@ public class ManufacturingServiceImpl implements ManufacturingService {
         double usedRawMatQty = Double.parseDouble(map.get("usedRawMatQty"));
         String usedRawMatQtyUnit = map.get("usedRawMatQtyUnit");
 
-        String manuftPrevBlockHash = "-";
-        String manuftCurrBlockHash = "-";;
+        String manuftPrevBlockHash = "";
+        String manuftCurrBlockHash = "";;
 
         String rawMaterialShippingId = map.get("rawMaterialShippingId");
         RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(rawMaterialShippingId);
         String productId = map.get("productId");
+        System.out.println("productid is :"+productId);
         Product product = productRepository.getReferenceById(productId);
 
         manufacturing = new Manufacturing(manufacturingId,manufactureDate,expireDate,productQty,productUnit,usedRawMatQty,usedRawMatQtyUnit,
@@ -93,6 +94,12 @@ public class ManufacturingServiceImpl implements ManufacturingService {
     public void deleteManufacturing(String manufacturingId) {
         Manufacturing manufacturing = manufacturingRepository.getReferenceById(manufacturingId);
         manufacturingRepository.delete(manufacturing);
+    }
+
+
+    @Override
+    public List<Manufacturing> getListAllManufacturingByUsername(String username) {
+        return manufacturingRepository.getManufacturingsByProduct_Manufacturer_User_Username(username);
     }
 
     public String generateManufacturingId (long rawId) {
