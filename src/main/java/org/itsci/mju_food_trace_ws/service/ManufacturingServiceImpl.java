@@ -93,6 +93,8 @@ public class ManufacturingServiceImpl implements ManufacturingService {
     @Override
     public void deleteManufacturing(String manufacturingId) {
         Manufacturing manufacturing = manufacturingRepository.getReferenceById(manufacturingId);
+        manufacturing.setRawMaterialShipping(null);
+        manufacturing.setProduct(null);
         manufacturingRepository.delete(manufacturing);
     }
 

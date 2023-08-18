@@ -59,5 +59,14 @@ public class ManufacturingController {
             return new ResponseEntity<>("Failed to update planting", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    @RequestMapping("/delete/{manufacturingId}")
+    public  ResponseEntity deletePlanting(@PathVariable("manufacturingId") String manufacturingId){
+        try {
+            manufacturingService.deleteManufacturing(manufacturingId);
+            return new ResponseEntity<>("Delete manufacturing succeed", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to delete planting", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

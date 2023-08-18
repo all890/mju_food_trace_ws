@@ -100,7 +100,7 @@ public class PlantingController {
     }
 
     @RequestMapping("/delete/{plantingId}")
-    public  ResponseEntity deletePlanting(@RequestBody @PathVariable("plantingId") String plantingId){
+    public  ResponseEntity deletePlanting(@PathVariable("plantingId") String plantingId){
         try {
             plantingService.deletePlanting(plantingId);
             return new ResponseEntity<>("Delete Planting succeed", HttpStatus.OK);
