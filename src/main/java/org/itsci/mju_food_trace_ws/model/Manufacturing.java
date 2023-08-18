@@ -39,7 +39,7 @@ public class Manufacturing {
     @JoinColumn(name = "rawMatShpId")
     private RawMaterialShipping rawMaterialShipping;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "productId")
     private Product product;
 
