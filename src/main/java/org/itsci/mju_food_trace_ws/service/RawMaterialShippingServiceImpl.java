@@ -76,11 +76,11 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
 
       Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
 
-      String maxRawMatShpId = plantingRepository.getMaxPlantingId();
+      String maxRawMatShpId = rawMaterialShippingRepository.getMaxRawMaterialShippingId();
       long maxRmsLong = 0;
 
       if (maxRawMatShpId != null) {
-        maxRmsLong = Long.parseLong(maxRawMatShpId.substring(2));
+        maxRmsLong = Long.parseLong(maxRawMatShpId.substring(3));
       }
       String rawMatShpId = generateRawMaterialShippingId(maxRmsLong + 1);
 

@@ -30,6 +30,7 @@ public class RawMaterialShippingController {
                 return new ResponseEntity<>("Failed to add rms because sum rawMatShpQty greater than plantingNetQty", HttpStatus.resolve(480));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>("Failed to add raw material shipping", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
