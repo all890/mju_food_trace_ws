@@ -65,6 +65,7 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
       ptNetQtyGrams = planting.getNetQuantity();
     }
 
+    //If sum of rms grams isn't greater than pt net qty grams, then hash
     if (sumOfRmsGrams <= ptNetQtyGrams) {
       String jsonStr = new ObjectMapper().writeValueAsString(planting);
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
