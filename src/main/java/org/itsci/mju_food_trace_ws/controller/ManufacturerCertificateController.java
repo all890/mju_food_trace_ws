@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,6 +29,18 @@ public class ManufacturerCertificateController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getlistmncertrenewreq")
+    public ResponseEntity getListMnCertRenewReq () {
+        try {
+            List<ManufacturerCertificate> manufacturerCertificates = manufacturerCertificateService.getManuftCertificatesByMnCertStatus("รอการอนุมัติ");
+            System.out.println(manufacturerCertificates.size());
+            return new ResponseEntity<>(manufacturerCertificates, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get list mn cert req renew!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

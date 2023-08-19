@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 public interface ManufacturerCertificateService {
@@ -15,6 +16,7 @@ public interface ManufacturerCertificateService {
     ManufacturerCertificate saveManufacturerCertificate(ManufacturerCertificate manufacturerCertificate);
     String uploadManufacturerCertificate (MultipartFile file) throws IOException;
     Path downloadManufacturerCertificate(String filePath);
+    List<ManufacturerCertificate> getManuftCertificatesByMnCertStatus(String mnCertStatus);
     String generateManufacturerCertificateId (long rawId);
     ManufacturerCertificate updateMnCertRegistStatus(String manuftId);
     ManufacturerCertificate saveRequestManufacturerCertificate(Map<String, String> map) throws ParseException;

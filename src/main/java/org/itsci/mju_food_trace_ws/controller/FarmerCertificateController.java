@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -47,6 +48,29 @@ public class FarmerCertificateController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to save farmer certificate data.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getlistfmcertrenewreq")
+    public ResponseEntity getListFmCertRenewReq () {
+        try {
+            List<FarmerCertificate> farmerCertificates = farmerCertificateService.getFarmerCertificatesByFmCertStatus("รอการอนุมัติ");
+            System.out.println(farmerCertificates.size());
+            return new ResponseEntity<>(farmerCertificates, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get list fm cert req renew!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getfmcertbyid/{fmCertId}")
+    public ResponseEntity getFmCertById (@PathVariable("fmCertId") String fmCertId) {
+        try {
+            FarmerCertificate farmerCertificate = farmerCertificateService.getFarmerCertificateById(fmCertId);
+            return new ResponseEntity<>(farmerCertificate, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get farmer certificate by id!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

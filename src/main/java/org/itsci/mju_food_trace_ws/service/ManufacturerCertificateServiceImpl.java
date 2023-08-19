@@ -14,6 +14,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -80,6 +81,11 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
     @Override
     public Path downloadManufacturerCertificate(String filePath) {
         return new File(MANUFACTURER_CERT_FOLDER_PATH + filePath).toPath();
+    }
+
+    @Override
+    public List<ManufacturerCertificate> getManuftCertificatesByMnCertStatus(String mnCertStatus) {
+        return manufacturerCertificateRepository.getManufacturerCertificatesByMnCertStatusEquals(mnCertStatus);
     }
 
     public String generateManufacturerCertificateId (long rawId) {

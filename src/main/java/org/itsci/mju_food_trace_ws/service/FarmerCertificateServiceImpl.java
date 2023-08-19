@@ -16,6 +16,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -33,6 +34,16 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     @Override
     public FarmerCertificate saveFarmerCertificate(FarmerCertificate farmerCertificate) {
         return farmerCertificateRepository.save(farmerCertificate);
+    }
+
+    @Override
+    public FarmerCertificate getFarmerCertificateById(String fmCertId) {
+        return farmerCertificateRepository.getReferenceById(fmCertId);
+    }
+
+    @Override
+    public List<FarmerCertificate> getFarmerCertificatesByFmCertStatus(String fmCertStatus) {
+        return farmerCertificateRepository.getFarmerCertificatesByFmCertStatusEquals(fmCertStatus);
     }
 
     @Override
