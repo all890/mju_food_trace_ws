@@ -2,8 +2,10 @@ package org.itsci.mju_food_trace_ws.service;
 
 import org.itsci.mju_food_trace_ws.model.Farmer;
 import org.itsci.mju_food_trace_ws.model.Planting;
+import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
 import org.itsci.mju_food_trace_ws.repository.FarmerRepository;
 import org.itsci.mju_food_trace_ws.repository.PlantingRepository;
+import org.itsci.mju_food_trace_ws.repository.RawMaterialShippingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,10 +16,7 @@ import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class PlantingServiceImpl implements PlantingService {
@@ -27,6 +26,9 @@ public class PlantingServiceImpl implements PlantingService {
 
     @Autowired
     private PlantingRepository plantingRepository;
+
+    @Autowired
+    private RawMaterialShippingRepository rawMaterialShippingRepository;
 
     @Override
     public List<Planting> getAllPlanting() {
@@ -39,9 +41,9 @@ public class PlantingServiceImpl implements PlantingService {
     }
 
     @Override
-    public List<Planting> getListPlantingById(String farmerId) {
+    public List<Planting> getListPlantingByFarmerUsername(String username) {
 
-        return plantingRepository.getPlantingsByFarmer_User_Username(farmerId);
+        return plantingRepository.getPlantingsByFarmer_User_Username(username);
     }
 
     @Override
@@ -105,6 +107,32 @@ public class PlantingServiceImpl implements PlantingService {
         return plantingRepository.save(planting);
     }
 
+    @Override
+    public Map<String, Double> getRemainNetQtyOfPtsByFarmerUsername(String username) {
+        Map<String, Double> remNetQty = new HashMap<>();
+        List<Planting> plantings = plantingRepository.getPlantingsByFarmer_User_Username(username);
+
+        for (Planting planting : plantings) {
+            double sumOfRawMatShpQtyGrams = 0.0;
+            List<RawMaterialShipping> rawMaterialShipping = rawMaterialShippingRepository.getRawMaterialShippingsByPlanting_PlantingId(planting.getPlantingId());
+            for (RawMaterialShipping rms : rawMaterialShipping) {
+                if (rms.getRawMatShpQtyUnit().equals("กิโลกรัม")) {
+                    sumOfRawMatShpQtyGrams += rms.getRawMatShpQty() * 1000.0;
+                } else {
+                    sumOfRawMatShpQtyGrams += rms.getRawMatShpQty();
+                }
+            }
+
+            if (planting.getNetQuantityUnit().equals("กิโลกรัม")) {
+                remNetQty.put(planting.getPlantingId(), (planting.getNetQuantity() * 1000.0) - sumOfRawMatShpQtyGrams);
+            } else {
+                remNetQty.put(planting.getPlantingId(), planting.getNetQuantity() - sumOfRawMatShpQtyGrams);
+            }
+
+        }
+
+        return remNetQty;
+    }
 
     @Override
     public void deletePlanting(String plantingId) {

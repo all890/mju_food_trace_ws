@@ -33,6 +33,17 @@ public class PlantingController {
         }
     }
 
+    @GetMapping("/getremqtyofpts/{username}")
+    public ResponseEntity getRemQtyOfPtsByFarmerUsername (@PathVariable("username") String username) {
+        try {
+            Map<String, Double> remQtyOfPts = plantingService.getRemainNetQtyOfPtsByFarmerUsername(username);
+            return new ResponseEntity<>(remQtyOfPts, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get list of remaining qty of plantings.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping("/uploadimg")
     public ResponseEntity uploadPlantingImg(@RequestParam("image") MultipartFile file) throws IllegalStateException, IOException {
         try {
@@ -50,10 +61,10 @@ public class PlantingController {
         return image;
     }
 
-    @RequestMapping("/listplantings/{farmerId}")
-    public ResponseEntity getListPlantingById (@PathVariable("farmerId") String farmerId){
+    @RequestMapping("/listplantings/{username}")
+    public ResponseEntity getListPlantingByFarmerUsername (@PathVariable("username") String username){
         try {
-            List<Planting> plantingList = plantingService.getListPlantingById(farmerId);
+            List<Planting> plantingList = plantingService.getListPlantingByFarmerUsername(username);
             return new ResponseEntity<>(plantingList, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

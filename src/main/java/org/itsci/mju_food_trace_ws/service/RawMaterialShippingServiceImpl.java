@@ -67,13 +67,15 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
 
     //If sum of rms grams isn't greater than pt net qty grams, then hash
     if (sumOfRmsGrams <= ptNetQtyGrams) {
-      String jsonStr = new ObjectMapper().writeValueAsString(planting);
-      MessageDigest digest = MessageDigest.getInstance("SHA-256");
-      byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
-      String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+      if (planting.getPtCurrBlockHash() == null) {
+        String jsonStr = new ObjectMapper().writeValueAsString(planting);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+        String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash);
 
-      planting.setPtCurrBlockHash(encodedPtCurrBlockHash);
-      plantingRepository.save(planting);
+        planting.setPtCurrBlockHash(encodedPtCurrBlockHash);
+        plantingRepository.save(planting);
+      }
 
       Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
 
@@ -85,7 +87,7 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
       }
       String rawMatShpId = generateRawMaterialShippingId(maxRmsLong + 1);
 
-      RawMaterialShipping rawMaterialShipping = new RawMaterialShipping(rawMatShpId, rawMatShpDate, rawMatShpQty, rawMatShpQtyUnit, planting.getPtCurrBlockHash(), "", planting, manufacturer);
+      RawMaterialShipping rawMaterialShipping = new RawMaterialShipping(rawMatShpId, rawMatShpDate, rawMatShpQty, rawMatShpQtyUnit, planting.getPtCurrBlockHash(), null, planting, manufacturer);
 
       String jsonStr2 = new ObjectMapper().writeValueAsString(rawMaterialShipping);
       MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
@@ -109,6 +111,19 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
   @Override
   public RawMaterialShipping getRawMaterialShippingById(String rawMatShpId) {
     return rawMaterialShippingRepository.getReferenceById(rawMatShpId);
+  }
+
+  @Override
+  public String testGetHash(String rawMatShpId) throws NoSuchAlgorithmException, JsonProcessingException {
+    RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(rawMatShpId);
+    rawMaterialShipping.setRmsCurrBlockHash(null);
+
+    String jsonStr = new ObjectMapper().writeValueAsString(rawMaterialShipping);
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+    String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+
+    return encodedPtCurrBlockHash;
   }
 
   public String generateRawMaterialShippingId (long rawId) {

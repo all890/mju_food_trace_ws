@@ -58,4 +58,15 @@ public class RawMaterialShippingController {
         }
 
     }
+
+    @GetMapping("/testgethash/{rawMatShpId}")
+    public ResponseEntity testGetHash (@PathVariable("rawMatShpId") String rawMatShpId) {
+        try {
+            String hash = rawMaterialShippingService.testGetHash(rawMatShpId);
+            return new ResponseEntity<>(hash, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get hash", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
