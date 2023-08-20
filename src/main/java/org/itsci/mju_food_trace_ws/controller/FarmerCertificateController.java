@@ -51,6 +51,17 @@ public class FarmerCertificateController {
         }
     }
 
+    @GetMapping("/getlatestfmcertbyusername/{username}")
+    public ResponseEntity getLatestFmCertByFarmerUsername (@PathVariable("username") String username) {
+        try {
+            FarmerCertificate farmerCertificate = farmerCertificateService.getLatestFarmerCertificateByFarmerUsername(username);
+            return new ResponseEntity<>(farmerCertificate, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get latest fm cert by username.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/getlistfmcertrenewreq")
     public ResponseEntity getListFmCertRenewReq () {
         try {

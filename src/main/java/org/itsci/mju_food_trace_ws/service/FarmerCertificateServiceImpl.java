@@ -115,4 +115,9 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         return farmerCertificateRepository.save(farmerCertificate);
     }
 
+    @Override
+    public FarmerCertificate getLatestFarmerCertificateByFarmerUsername(String username) {
+        return farmerCertificateRepository.getLatestFarmerCertificateByFarmerUsername(username);
+    }
+
 }
