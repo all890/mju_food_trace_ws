@@ -44,6 +44,17 @@ public class ManufacturerCertificateController {
         }
     }
 
+    @GetMapping("/getlatestmncertbyusername/{username}")
+    public ResponseEntity getLatestMnCertByManufacturerUsername (@PathVariable("username") String username) {
+        try {
+            ManufacturerCertificate manufacturerCertificate = manufacturerCertificateService.getLatestManufacturerCertificateByManufacturerUsername(username);
+            return new ResponseEntity<>(manufacturerCertificate, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get latest mn cert by username.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping("/{filePath}")
     public byte[] downloadManufacturerCertificate (@PathVariable("filePath") String filePath) throws IOException {
         byte[] image = Files.readAllBytes(manufacturerCertificateService.downloadManufacturerCertificate(filePath));

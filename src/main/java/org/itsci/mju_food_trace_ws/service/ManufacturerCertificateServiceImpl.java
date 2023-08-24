@@ -37,6 +37,12 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
     }
 
     @Override
+    public ManufacturerCertificate getLatestManufacturerCertificateByManufacturerUsername(String username) {
+        System.out.println(username);
+        return manufacturerCertificateRepository.getLatestManufacturerCertificateByManufacturerUsername(username);
+    }
+
+    @Override
     public ManufacturerCertificate saveRequestManufacturerCertificate(Map<String, String> map) throws ParseException {
         User user = null;
 
