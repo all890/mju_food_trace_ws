@@ -86,6 +86,17 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/getprodexists/{username}")
+    public ResponseEntity getProductExistingByManufacturerUsername (@PathVariable("username") String username) {
+        try {
+            Map<String, String> prodExisting = productService.getProductExistingByManufacturerUsername(username);
+            return new ResponseEntity<>(prodExisting, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get list of remaining qty of plantings.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping("/testjson")
     public void testJson () throws JsonProcessingException, NoSuchAlgorithmException {
         Product product = productService.getProductById("PD00000001");

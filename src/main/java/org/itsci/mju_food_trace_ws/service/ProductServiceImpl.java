@@ -1,12 +1,15 @@
 package org.itsci.mju_food_trace_ws.service;
 
 import org.itsci.mju_food_trace_ws.model.Manufacturer;
+import org.itsci.mju_food_trace_ws.model.Manufacturing;
 import org.itsci.mju_food_trace_ws.model.Product;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerRepository;
+import org.itsci.mju_food_trace_ws.repository.ManufacturingRepository;
 import org.itsci.mju_food_trace_ws.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ManufacturerRepository manufacturerRepository;
+
+    @Autowired
+    private ManufacturingRepository manufacturingRepository;
 
     @Override
     public List<Product> getAllProducts() {
@@ -71,6 +77,24 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product updateProduct(Product product) {
         return productRepository.save(product);
+    }
+
+    @Override
+    public Map<String, String> getProductExistingByManufacturerUsername(String username) {
+        Map<String, String> prodExisting = new HashMap<>();
+        List<Product> products = productRepository.getProductsByManufacturer_User_Username(username);
+
+        for (Product product : products) {
+            List<Manufacturing> manufacturings = manufacturingRepository.getManufacturingsByProduct_Manufacturer_User_Username(username);
+            for (Manufacturing manufacturing : manufacturings) {
+                if (product.getProductId().equals(manufacturing.getProduct().getProductId())) {
+                    prodExisting.put(product.getProductId(), "was manufactured");
+                    break;
+                }
+            }
+        }
+
+        return prodExisting;
     }
 
     @Override

@@ -12,6 +12,7 @@ public interface ProductService {
     Product getProductById (String productId);
     Product addProduct (Map<String, String> map);
     Product updateProduct (Product product);
+    Map<String, String> getProductExistingByManufacturerUsername (String username);
     void deleteProduct (String productId);
 
 }

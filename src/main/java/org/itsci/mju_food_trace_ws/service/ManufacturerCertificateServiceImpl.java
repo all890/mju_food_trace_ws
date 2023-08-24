@@ -38,7 +38,6 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
 
     @Override
     public ManufacturerCertificate getLatestManufacturerCertificateByManufacturerUsername(String username) {
-        System.out.println(username);
         return manufacturerCertificateRepository.getLatestManufacturerCertificateByManufacturerUsername(username);
     }
 
