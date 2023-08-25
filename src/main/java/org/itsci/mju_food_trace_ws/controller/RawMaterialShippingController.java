@@ -81,6 +81,21 @@ public class RawMaterialShippingController {
 
     }
 
+    @GetMapping("/isrmsandptcv/{rawMatShpId}")
+    public ResponseEntity isRmsAndPlantingChainValid (@PathVariable("rawMatShpId") String rawMatShpId) {
+        try {
+            boolean isChainValid = rawMaterialShippingService.isRmsAndPlantingChainValid(rawMatShpId);
+            if (isChainValid) {
+                return new ResponseEntity<>("Chain is valid", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Chain isn't valid", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get chain's validation", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/testgethash/{rawMatShpId}")
     public ResponseEntity testGetHash (@PathVariable("rawMatShpId") String rawMatShpId) {
         try {

@@ -163,6 +163,57 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
   }
 
   @Override
+  public boolean isRmsAndPlantingChainValid(String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException {
+    RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(rawMatShpId);
+
+    //TODO: check curr hash of planting
+    Planting planting = rawMaterialShipping.getPlanting();
+    String tempPtCurrHash = planting.getPtCurrBlockHash();
+    planting.setPtCurrBlockHash(null);
+
+    String jsonStr = new ObjectMapper().writeValueAsString(planting);
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+    String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+
+    System.out.println("1 OLD HASH : " + tempPtCurrHash);
+    System.out.println("1 NEW HASH : " + encodedPtCurrBlockHash);
+
+    if (tempPtCurrHash.equals(encodedPtCurrBlockHash)) {
+      //TODO: check curr hash of planting and prev hash of rms
+      if (rawMaterialShipping.getRmsPrevBlockHash().equals(tempPtCurrHash)) {
+        //TODO: check curr hash of rms
+        planting.setPtCurrBlockHash(tempPtCurrHash);
+
+        String tempRmsCurrHash = rawMaterialShipping.getRmsCurrBlockHash();
+        rawMaterialShipping.setRmsCurrBlockHash(null);
+
+        String jsonStr2 = new ObjectMapper().writeValueAsString(rawMaterialShipping);
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+        String encodedPtCurrBlockHash2 = Base64.getEncoder().encodeToString(hash2);
+
+        System.out.println("3 OLD HASH : " + tempRmsCurrHash);
+        System.out.println("3 NEW HASH : " + encodedPtCurrBlockHash2);
+
+        if (tempRmsCurrHash.equals(encodedPtCurrBlockHash2)) {
+          return true;
+        } else {
+          System.out.println("ERROR THIRD FLOOR!");
+          return false;
+        }
+      } else {
+        System.out.println("ERROR SECOND FLOOR!");
+        return false;
+      }
+    } else {
+      System.out.println("ERROR FIRST FLOOR!");
+      return false;
+    }
+
+  }
+
+  @Override
   public String testGetHash(String rawMatShpId) throws NoSuchAlgorithmException, JsonProcessingException {
     RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(rawMatShpId);
     rawMaterialShipping.setRmsCurrBlockHash(null);
