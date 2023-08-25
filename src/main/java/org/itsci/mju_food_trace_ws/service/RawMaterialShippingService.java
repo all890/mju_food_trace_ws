@@ -14,5 +14,7 @@ public interface RawMaterialShippingService {
     RawMaterialShipping addRawMaterialShipping(Map<String, String> map) throws ParseException, NoSuchAlgorithmException, JsonProcessingException;
     List<RawMaterialShipping> getListAllSentAgriByUsername(String username);
     RawMaterialShipping getRawMaterialShippingById(String rawMatShpId);
+    Map<String, String> getRmsExistingByManufacturerUsername (String username);
+    Map<String, Double> getRemainNetQtyOfRmsByManufacturerUsername (String username);
     String testGetHash (String rawMatShpId) throws NoSuchAlgorithmException, JsonProcessingException;
 }

@@ -10,7 +10,10 @@ import java.util.List;
 public interface ManufacturingRepository extends JpaRepository<Manufacturing, String> {
 
     List<Manufacturing> getManufacturingsByProduct_ProductId (String productId);
+    List<Manufacturing> getManufacturingsByRawMaterialShipping_RawMatShpId (String rawMatShpId);
+
     @Query(value = "SELECT m.manufacturing_id FROM manufacturings m ORDER BY m.manufacturing_id DESC LIMIT 1", nativeQuery = true)
     String getMaxManufacturingId();
     List<Manufacturing> getManufacturingsByProduct_Manufacturer_User_Username (String username);
+    boolean existsManufacturingByRawMaterialShipping_RawMatShpId (String rawMatShpId);
 }

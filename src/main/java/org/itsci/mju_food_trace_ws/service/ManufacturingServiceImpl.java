@@ -67,12 +67,14 @@ public class ManufacturingServiceImpl implements ManufacturingService {
         String productUnit = map.get("productUnit");
         double usedRawMatQty = Double.parseDouble(map.get("usedRawMatQty"));
         String usedRawMatQtyUnit = map.get("usedRawMatQtyUnit");
-
-        String manuftPrevBlockHash = "";
-        String manuftCurrBlockHash = "";;
-
         String rawMaterialShippingId = map.get("rawMaterialShippingId");
         RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(rawMaterialShippingId);
+
+        String manuftPrevBlockHash = rawMaterialShipping.getRmsCurrBlockHash();
+        String manuftCurrBlockHash = null;
+
+
+
         String productId = map.get("productId");
         System.out.println("productid is :"+productId);
         Product product = productRepository.getReferenceById(productId);

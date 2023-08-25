@@ -47,6 +47,28 @@ public class RawMaterialShippingController {
         }
     }
 
+    @GetMapping("/getrmsexists/{username}")
+    public ResponseEntity getRmsExistInManufacturingByManutftUsername (@PathVariable("username") String username) {
+        try {
+            Map<String, String> rmsExist = rawMaterialShippingService.getRmsExistingByManufacturerUsername(username);
+            return new ResponseEntity<>(rmsExist, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get list of rms exist", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getremqtyofrms/{username}")
+    public ResponseEntity getRemQtyOfRmsByManufacturerUsername (@PathVariable("username") String username) {
+        try {
+            Map<String, Double> remQtyOfRms = rawMaterialShippingService.getRemainNetQtyOfRmsByManufacturerUsername(username);
+            return new ResponseEntity<>(remQtyOfRms, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get list of remaining qty of rms.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/getrmsdetails/{rawMatShpId}")
     public ResponseEntity getRawMaterialShippingDetails(@PathVariable("rawMatShpId") String rawMatShpId) {
         try {

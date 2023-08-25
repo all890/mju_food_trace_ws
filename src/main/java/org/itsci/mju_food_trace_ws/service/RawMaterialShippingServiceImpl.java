@@ -3,9 +3,11 @@ package org.itsci.mju_food_trace_ws.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.Manufacturer;
+import org.itsci.mju_food_trace_ws.model.Manufacturing;
 import org.itsci.mju_food_trace_ws.model.Planting;
 import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerRepository;
+import org.itsci.mju_food_trace_ws.repository.ManufacturingRepository;
 import org.itsci.mju_food_trace_ws.repository.PlantingRepository;
 import org.itsci.mju_food_trace_ws.repository.RawMaterialShippingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import java.util.*;
 
 @Service
 public class RawMaterialShippingServiceImpl implements RawMaterialShippingService {
+
   @Autowired
   private RawMaterialShippingRepository rawMaterialShippingRepository;
 
@@ -29,6 +32,9 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
 
   @Autowired
   private ManufacturerRepository manufacturerRepository;
+
+  @Autowired
+  private ManufacturingRepository manufacturingRepository;
 
   @Override
   public RawMaterialShipping addRawMaterialShipping(Map<String, String> map) throws ParseException, NoSuchAlgorithmException, JsonProcessingException {
@@ -111,6 +117,49 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
   @Override
   public RawMaterialShipping getRawMaterialShippingById(String rawMatShpId) {
     return rawMaterialShippingRepository.getReferenceById(rawMatShpId);
+  }
+
+  @Override
+  public Map<String, String> getRmsExistingByManufacturerUsername(String username) {
+
+    Map<String, String> rmsExists = new HashMap<>();
+
+    List<RawMaterialShipping> rawMaterialShippings = rawMaterialShippingRepository.getRawMaterialShippingsByManufacturer_User_Username(username);
+
+    for (RawMaterialShipping rms : rawMaterialShippings) {
+      if (manufacturingRepository.existsManufacturingByRawMaterialShipping_RawMatShpId(rms.getRawMatShpId())) {
+        rmsExists.put(rms.getRawMatShpId(), "exist");
+      }
+    }
+
+    return rmsExists;
+  }
+
+  @Override
+  public Map<String, Double> getRemainNetQtyOfRmsByManufacturerUsername(String username) {
+    Map<String, Double> remNetQty = new HashMap<>();
+    List<RawMaterialShipping> rawMaterialShippings = rawMaterialShippingRepository.getRawMaterialShippingsByManufacturer_User_Username(username);
+
+    for (RawMaterialShipping rms : rawMaterialShippings) {
+      double sumOfManuftQtyGrams = 0.0;
+      List<Manufacturing> manufacturings = manufacturingRepository.getManufacturingsByRawMaterialShipping_RawMatShpId(rms.getRawMatShpId());
+      for (Manufacturing manufacturing : manufacturings) {
+        if (manufacturing.getUsedRawMatQtyUnit().equals("กิโลกรัม")) {
+          sumOfManuftQtyGrams += manufacturing.getUsedRawMatQty() * 1000.0;
+        } else {
+          sumOfManuftQtyGrams += manufacturing.getUsedRawMatQty();
+        }
+      }
+
+      if (rms.getRawMatShpQtyUnit().equals("กิโลกรัม")) {
+        remNetQty.put(rms.getRawMatShpId(), (rms.getRawMatShpQty() * 1000.0) - sumOfManuftQtyGrams);
+      } else {
+        remNetQty.put(rms.getRawMatShpId(), rms.getRawMatShpQty() - sumOfManuftQtyGrams);
+      }
+
+    }
+
+    return remNetQty;
   }
 
   @Override
