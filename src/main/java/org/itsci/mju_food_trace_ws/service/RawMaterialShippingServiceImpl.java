@@ -45,6 +45,8 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
     DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
     Date rawMatShpDate = format.parse(map.get("rawMatShpDate"));
 
+    System.out.println(rawMatShpDate);
+
     double rawMatShpQty = Double.parseDouble(map.get("rawMatShpQty"));
     String rawMatShpQtyUnit = map.get("rawMatShpQtyUnit");
 
