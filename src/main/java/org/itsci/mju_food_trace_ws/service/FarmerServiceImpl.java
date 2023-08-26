@@ -79,7 +79,7 @@ public class FarmerServiceImpl implements FarmerService {
         String fmCertRegDateStr = map.get("fmCertRegDate");
         String fmCertExpireDateStr = map.get("fmCertExpireDate");
 
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Date fmCertRegDate = format.parse(fmCertRegDateStr);
         Date fmCertExpireDate = format.parse(fmCertExpireDateStr);
 

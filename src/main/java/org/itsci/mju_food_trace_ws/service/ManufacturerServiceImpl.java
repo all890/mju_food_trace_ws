@@ -93,7 +93,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
         String mnCertRegDateStr = map.get("mnCertRegDate");
         String mnCertExpireDateStr = map.get("mnCertExpireDate");
 
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Date mnCertRegDate = format.parse(mnCertRegDateStr);
         Date mnCertExpireDate = format.parse(mnCertExpireDateStr);
 

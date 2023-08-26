@@ -42,7 +42,7 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
     String manuftId = map.get("manuftId");
     String plantingId = map.get("plantingId");
 
-    DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+    DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
     Date rawMatShpDate = format.parse(map.get("rawMatShpDate"));
 
     System.out.println(rawMatShpDate);

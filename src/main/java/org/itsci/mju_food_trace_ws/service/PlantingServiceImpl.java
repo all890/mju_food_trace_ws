@@ -61,7 +61,7 @@ public class PlantingServiceImpl implements PlantingService {
         String plantingId = generatePlantingId(maxPlantingLong + 1);
         String plantName = map.get("plantName");
         String plantDatestr = map.get("plantDate");
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Date plantDate = format.parse(plantDatestr);
 
         String plantingImg = map.get("plantingImg");

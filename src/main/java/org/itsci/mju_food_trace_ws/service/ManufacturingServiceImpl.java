@@ -59,7 +59,7 @@ public class ManufacturingServiceImpl implements ManufacturingService {
         String manufactureDatestr = map.get("manufactureDate");
         String expireDatestr = map.get("expireDate");
 
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Date manufactureDate = format.parse(manufactureDatestr);
         Date expireDate = format.parse(expireDatestr);
 
