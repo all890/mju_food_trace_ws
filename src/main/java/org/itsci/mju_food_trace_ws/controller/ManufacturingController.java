@@ -29,6 +29,17 @@ public class ManufacturingController {
         }
     }
 
+    @GetMapping("/record/{manufacturingId}")
+    public ResponseEntity recordManufacturing(@PathVariable("manufacturingId") String manufacturingId) {
+        try {
+            Manufacturing manufacturing = manufacturingService.recordManufacturing(manufacturingId);
+            return new ResponseEntity<>(manufacturing, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to save manufacturing data.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping("/listallmanufacturing/{username}")
     public ResponseEntity getListAllManufacturing(@PathVariable("username") String username) {
         try {

@@ -1,5 +1,7 @@
 package org.itsci.mju_food_trace_ws.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.Manufacturing;
 import org.itsci.mju_food_trace_ws.model.Product;
 import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
@@ -9,17 +11,16 @@ import org.itsci.mju_food_trace_ws.repository.RawMaterialShippingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ManufacturingServiceImpl implements ManufacturingService {
-
 
     @Autowired
     private ManufacturingRepository manufacturingRepository;
@@ -98,6 +99,20 @@ public class ManufacturingServiceImpl implements ManufacturingService {
         manufacturing.setRawMaterialShipping(null);
         manufacturing.setProduct(null);
         manufacturingRepository.delete(manufacturing);
+    }
+
+    @Override
+    public Manufacturing recordManufacturing(String manufacturingId) throws JsonProcessingException, NoSuchAlgorithmException {
+        Manufacturing manufacturing = manufacturingRepository.getReferenceById(manufacturingId);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(manufacturing);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+        String encodedManuftCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+
+        manufacturing.setManuftCurrBlockHash(encodedManuftCurrBlockHash);
+
+        return manufacturingRepository.save(manufacturing);
     }
 
 
