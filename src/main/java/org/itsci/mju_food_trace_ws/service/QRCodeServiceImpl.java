@@ -102,7 +102,6 @@ public class QRCodeServiceImpl implements QRCodeService {
             }
         }
 
-        BufferedImage image1 = image;
         BufferedImage image2 = ImageIO.read(new File("C:/img/logo.png"));
 
 
