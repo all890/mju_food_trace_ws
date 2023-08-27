@@ -59,6 +59,16 @@ public class QRCodeServiceImpl implements QRCodeService {
         return new File(QRCODE_FOLDER_PATH + qrcodeId + ".jpg").toPath();
     }
 
+    @Override
+    public QRCode getProductDetailsByQRCodeId(String qrcodeId) {
+        QRCode qrCode = null;
+        if (qrCodeRepository.existsById(qrcodeId)) {
+            qrCode = qrCodeRepository.getReferenceById(qrcodeId);
+            return qrCode;
+        }
+        return qrCode;
+    }
+
     private String generateQRCodeImage (String qrcodeId) throws IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         Map<EncodeHintType, Object> hintsMap = new HashMap<>();

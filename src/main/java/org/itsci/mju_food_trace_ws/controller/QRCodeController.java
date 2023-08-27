@@ -32,6 +32,21 @@ public class QRCodeController {
         }
     }
 
+    @GetMapping("/getproddetails/{qrcodeId}")
+    public ResponseEntity getProductDetailsByQRCodeId (@PathVariable("qrcodeId") String qrcodeId) {
+        try {
+            QRCode qrCode = qrCodeService.getProductDetailsByQRCodeId(qrcodeId);
+            if (qrCode != null) {
+                return new ResponseEntity<>(qrCode, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Not found qr code id!", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to product details by qr code!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(value = "/getqrcodebyid/{qrcodeId}", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] downloadQRCode (@PathVariable("qrcodeId") String qrcodeId) throws IOException {
         byte[] image = Files.readAllBytes(qrCodeService.downloadQRCode(qrcodeId));

@@ -9,5 +9,6 @@ public interface QRCodeService {
 
     QRCode generateQRCode (String manufacturingId) throws IOException;
     Path downloadQRCode(String qrcodeId);
+    QRCode getProductDetailsByQRCodeId (String qrcodeId);
 
 }
