@@ -1,11 +1,15 @@
 package org.itsci.mju_food_trace_ws.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import org.itsci.mju_food_trace_ws.model.Manufacturing;
+import org.itsci.mju_food_trace_ws.model.Planting;
 import org.itsci.mju_food_trace_ws.model.QRCode;
+import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
 import org.itsci.mju_food_trace_ws.repository.ManufacturingRepository;
 import org.itsci.mju_food_trace_ws.repository.QRCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +21,12 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,6 +75,80 @@ public class QRCodeServiceImpl implements QRCodeService {
             return qrCode;
         }
         return qrCode;
+    }
+
+    @Override
+    public boolean isWholeChainValid(QRCode qrCode) throws JsonProcessingException, NoSuchAlgorithmException {
+
+        Planting planting = qrCode.getManufacturing().getRawMaterialShipping().getPlanting();
+        RawMaterialShipping rawMaterialShipping = qrCode.getManufacturing().getRawMaterialShipping();
+        Manufacturing manufacturing = qrCode.getManufacturing();
+
+        //First step : checking the current hash of planting
+        String tempPtCurrHash = planting.getPtCurrBlockHash();
+        planting.setPtCurrBlockHash(null);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(planting);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+        String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+
+        System.out.println("1 OLD HASH : " + tempPtCurrHash);
+        System.out.println("1 NEW HASH : " + encodedPtCurrBlockHash);
+
+        if (tempPtCurrHash.equals(encodedPtCurrBlockHash)) {
+            if (rawMaterialShipping.getRmsPrevBlockHash().equals(tempPtCurrHash)) {
+                planting.setPtCurrBlockHash(tempPtCurrHash);
+
+                String tempRmsCurrHash = rawMaterialShipping.getRmsCurrBlockHash();
+                rawMaterialShipping.setRmsCurrBlockHash(null);
+
+                String jsonStr2 = new ObjectMapper().writeValueAsString(rawMaterialShipping);
+                MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+                byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+                String encodedPtCurrBlockHash2 = Base64.getEncoder().encodeToString(hash2);
+
+                System.out.println("3 OLD HASH : " + tempRmsCurrHash);
+                System.out.println("3 NEW HASH : " + encodedPtCurrBlockHash2);
+
+                if (tempRmsCurrHash.equals(encodedPtCurrBlockHash2)) {
+                    if (manufacturing.getManuftPrevBlockHash().equals(tempRmsCurrHash)) {
+                        rawMaterialShipping.setRmsCurrBlockHash(tempRmsCurrHash);
+
+                        String tempManuftCurrHash = manufacturing.getManuftCurrBlockHash();
+                        manufacturing.setManuftCurrBlockHash(null);
+
+                        String jsonStr3 = new ObjectMapper().writeValueAsString(manufacturing);
+                        MessageDigest digest3 = MessageDigest.getInstance("SHA-256");
+                        byte[] hash3 = digest3.digest(jsonStr3.getBytes(StandardCharsets.UTF_8));
+                        String encodedPtCurrBlockHash3 = Base64.getEncoder().encodeToString(hash3);
+
+                        System.out.println("4 OLD HASH : " + tempManuftCurrHash);
+                        System.out.println("4 NEW HASH : " + encodedPtCurrBlockHash3);
+
+                        if (tempManuftCurrHash.equals(encodedPtCurrBlockHash3)) {
+                            return true;
+                        } else {
+                            System.out.println("ERROR FIFTH FLOOR!");
+                            return false;
+                        }
+                    } else {
+                        System.out.println("ERROR FOURTH FLOOR!");
+                        return false;
+                    }
+                } else {
+                    System.out.println("ERROR THIRD FLOOR!");
+                    return false;
+                }
+            } else {
+                System.out.println("ERROR SECOND FLOOR!");
+                return false;
+            }
+        } else {
+            System.out.println("ERROR FIRST FLOOR!");
+            return false;
+        }
+
     }
 
     private String generateQRCodeImage (String qrcodeId) throws IOException {

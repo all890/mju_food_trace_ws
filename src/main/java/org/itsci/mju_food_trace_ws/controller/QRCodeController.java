@@ -37,7 +37,11 @@ public class QRCodeController {
         try {
             QRCode qrCode = qrCodeService.getProductDetailsByQRCodeId(qrcodeId);
             if (qrCode != null) {
-                return new ResponseEntity<>(qrCode, HttpStatus.OK);
+                if (qrCodeService.isWholeChainValid(qrCode)) {
+                    return new ResponseEntity<>(qrCode, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>("Chain isn't valid", HttpStatus.CONFLICT);
+                }
             } else {
                 return new ResponseEntity<>("Not found qr code id!", HttpStatus.NOT_FOUND);
             }
