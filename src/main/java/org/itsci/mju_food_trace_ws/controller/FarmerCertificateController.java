@@ -84,5 +84,26 @@ public class FarmerCertificateController {
             return new ResponseEntity<>("Failed to get farmer certificate by id!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/getfmcertdetails/{fmCertId}")
+    public ResponseEntity getFarmerDetails (@PathVariable("fmCertId") String fmCertId) {
+        try {
+            FarmerCertificate farmerCertificate = farmerCertificateService.getFarmerCertificateById(fmCertId);
+            return new ResponseEntity<>(farmerCertificate, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get farmer certificate details", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/updatefmrenewingrequestcert/{fmCertId}")
+    public ResponseEntity updateFmRegistStatus (@PathVariable("fmCertId") String fmCertId) {
+        try {
+            System.out.println("UPDATE FARMER RENEWING REQUET CERT");
+            FarmerCertificate farmerCertificate = farmerCertificateService.updateFmRenewingRequetCertStatus(fmCertId);
+            return new ResponseEntity<>(farmerCertificate, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to update farmer renewing requet certificate status", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

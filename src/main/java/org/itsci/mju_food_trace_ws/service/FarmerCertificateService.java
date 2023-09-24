@@ -19,6 +19,7 @@ public interface FarmerCertificateService {
     Path downloadFarmerCertificate(String filePath);
     String generateFarmerCertificateId (long rawId);
     FarmerCertificate updateFmCertRegistStatus(String farmerId);
+    FarmerCertificate updateFmRenewingRequetCertStatus(String fmCertId);
     FarmerCertificate getLatestFarmerCertificateByFarmerUsername(String username);
     FarmerCertificate saveRequestFarmerCertificate(Map<String, String> map) throws ParseException;
 

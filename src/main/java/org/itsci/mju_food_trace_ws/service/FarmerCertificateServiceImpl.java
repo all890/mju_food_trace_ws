@@ -116,6 +116,13 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     }
 
     @Override
+    public FarmerCertificate updateFmRenewingRequetCertStatus(String fmCertId) {
+        FarmerCertificate farmerCertificate = farmerCertificateRepository.getReferenceById(fmCertId);
+        farmerCertificate.setFmCertStatus("อนุมัติ");
+        return farmerCertificateRepository.save(farmerCertificate);
+    }
+
+    @Override
     public FarmerCertificate getLatestFarmerCertificateByFarmerUsername(String username) {
         return farmerCertificateRepository.getLatestFarmerCertificateByFarmerUsername(username);
     }
