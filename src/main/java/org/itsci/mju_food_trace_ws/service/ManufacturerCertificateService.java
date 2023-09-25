@@ -21,6 +21,8 @@ public interface ManufacturerCertificateService {
     String generateManufacturerCertificateId (long rawId);
     ManufacturerCertificate updateMnCertRegistStatus(String manuftId);
     ManufacturerCertificate declineMnCertRegistStatus(String manuftId);
+    ManufacturerCertificate updateMnRenewingRequetCertStatus(String mnCertId);
+    ManufacturerCertificate declineMnRenewingRequetCertStatus(String mnCertId);
     ManufacturerCertificate getLatestManufacturerCertificateByManufacturerUsername(String username);
     ManufacturerCertificate saveRequestManufacturerCertificate(Map<String, String> map) throws ParseException;
 }

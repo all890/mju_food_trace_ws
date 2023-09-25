@@ -80,4 +80,28 @@ public class ManufacturerCertificateController {
             return new ResponseEntity<>("Failed to get manufacturer certificate details", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/updatemnrenewingrequestcert/{mnCertId}")
+    public ResponseEntity updateMnRenewingReqCert (@PathVariable("mnCertId") String mnCertId) {
+        try {
+            System.out.println("UPDATE MANUFACTURER RENEWING REQUET CERT");
+            ManufacturerCertificate manufacturerCertificate = manufacturerCertificateService.updateMnRenewingRequetCertStatus(mnCertId);
+            return new ResponseEntity<>(manufacturerCertificate, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to update manufacturer renewing requet certificate status", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/declinemnrenewingrequestcert/{mnCertId}")
+    public ResponseEntity declineFmRenewingReqCert (@PathVariable("mnCertId") String mnCertId) {
+        try {
+            System.out.println(mnCertId);
+            System.out.println("DECLINE MANUFACTURER RENEWING REQUET CERT");
+            ManufacturerCertificate manufacturerCertificate = manufacturerCertificateService.declineMnRenewingRequetCertStatus(mnCertId);
+            return new ResponseEntity<>(manufacturerCertificate, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("DECLINE to update manufacturer renewing requet certificate status", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

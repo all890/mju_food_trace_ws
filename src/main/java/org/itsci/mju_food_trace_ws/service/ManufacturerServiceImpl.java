@@ -53,7 +53,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     @Override
     public Manufacturer declineMnRegistStatus(String manuftId) {
         Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
-        manufacturer.setManuftRegStatus("ปฎิเสธ");
+        manufacturer.setManuftRegStatus("ไม่อนุมัติ");
         manufacturerCertificateService.declineMnCertRegistStatus(manuftId);
         return manufacturerRepository.save(manufacturer);
     }

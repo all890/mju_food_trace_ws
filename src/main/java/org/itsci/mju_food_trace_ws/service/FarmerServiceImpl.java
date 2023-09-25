@@ -109,7 +109,7 @@ public class FarmerServiceImpl implements FarmerService {
     @Override
     public Farmer declineFmRegistStatus(String farmerId) {
         Farmer farmer = farmerRepository.getReferenceById(farmerId);
-        farmer.setFarmerRegStatus("ปฎิเสธ");
+        farmer.setFarmerRegStatus("ไม่อนุมัติ");
         farmerCertificateService.updateFmCertRegistStatusDecline(farmerId);
         return farmerRepository.save(farmer);
     }

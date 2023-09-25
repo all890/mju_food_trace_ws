@@ -39,7 +39,21 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
     @Override
     public ManufacturerCertificate declineMnCertRegistStatus(String manuftId) {
         ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getManufacturerCertificateByManufacturer_ManuftId(manuftId);
-        manufacturerCertificate.setMnCertStatus("ปฎิเสธ");
+        manufacturerCertificate.setMnCertStatus("ไม่อนุมัติ");
+        return manufacturerCertificateRepository.save(manufacturerCertificate);
+    }
+
+    @Override
+    public ManufacturerCertificate updateMnRenewingRequetCertStatus(String mnCertId) {
+        ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getReferenceById(mnCertId);
+        manufacturerCertificate.setMnCertStatus("อนุมัติ");
+        return manufacturerCertificateRepository.save(manufacturerCertificate);
+    }
+
+    @Override
+    public ManufacturerCertificate declineMnRenewingRequetCertStatus(String mnCertId) {
+        ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getReferenceById(mnCertId);
+        manufacturerCertificate.setMnCertStatus("ไม่อนุมัติ");
         return manufacturerCertificateRepository.save(manufacturerCertificate);
     }
 
