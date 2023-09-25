@@ -51,6 +51,14 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     }
 
     @Override
+    public Manufacturer declineMnRegistStatus(String manuftId) {
+        Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
+        manufacturer.setManuftRegStatus("ปฎิเสธ");
+        manufacturerCertificateService.declineMnCertRegistStatus(manuftId);
+        return manufacturerRepository.save(manufacturer);
+    }
+
+    @Override
     public ManufacturerCertificate getManufacturerDetails(String manuftId) {
         ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getManufacturerCertificateByManufacturer_ManuftId(manuftId);
         return manufacturerCertificate;

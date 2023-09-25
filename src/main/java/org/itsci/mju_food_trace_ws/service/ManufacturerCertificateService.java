@@ -15,10 +15,12 @@ public interface ManufacturerCertificateService {
 
     ManufacturerCertificate saveManufacturerCertificate(ManufacturerCertificate manufacturerCertificate);
     String uploadManufacturerCertificate (MultipartFile file) throws IOException;
+    ManufacturerCertificate getManufacturerCertificateById (String mnCertId);
     Path downloadManufacturerCertificate(String filePath);
     List<ManufacturerCertificate> getManuftCertificatesByMnCertStatus(String mnCertStatus);
     String generateManufacturerCertificateId (long rawId);
     ManufacturerCertificate updateMnCertRegistStatus(String manuftId);
+    ManufacturerCertificate declineMnCertRegistStatus(String manuftId);
     ManufacturerCertificate getLatestManufacturerCertificateByManufacturerUsername(String username);
     ManufacturerCertificate saveRequestManufacturerCertificate(Map<String, String> map) throws ParseException;
 }

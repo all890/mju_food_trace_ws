@@ -52,6 +52,17 @@ public class ManufacturerController {
             return new ResponseEntity<>("Failed to update manufacturer registration status", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/declinemnregiststat/{manuftId}")
+    public ResponseEntity declineMnRegistStatus (@PathVariable("manuftId") String manuftId) {
+        try {
+            System.out.println("DECLINE MANUFT REGIST STAT");
+            Manufacturer manufacturer = manufacturerService.declineMnRegistStatus(manuftId);
+            return new ResponseEntity<>(manufacturer, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to decline manufacturer registration status", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @RequestMapping("/listmnregist")
     public ResponseEntity getListAllManufacturerRegistration () {

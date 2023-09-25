@@ -15,6 +15,7 @@ public interface FarmerService {
     Farmer saveFarmer(Map<String, String> map) throws ParseException;
     Farmer updateFarmer(Farmer farmer);
     Farmer updateFmRegistStatus(String farmerId);
+    Farmer declineFmRegistStatus(String farmerId);
     FarmerCertificate getFarmerDetails(String farmerId);
     void deleteFarmer(String farmerId);
 

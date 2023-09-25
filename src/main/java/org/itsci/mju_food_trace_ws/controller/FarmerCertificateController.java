@@ -95,7 +95,7 @@ public class FarmerCertificateController {
         }
     }
     @GetMapping("/updatefmrenewingrequestcert/{fmCertId}")
-    public ResponseEntity updateFmRegistStatus (@PathVariable("fmCertId") String fmCertId) {
+    public ResponseEntity updateFmRenewingReqCert (@PathVariable("fmCertId") String fmCertId) {
         try {
             System.out.println("UPDATE FARMER RENEWING REQUET CERT");
             FarmerCertificate farmerCertificate = farmerCertificateService.updateFmRenewingRequetCertStatus(fmCertId);
@@ -103,6 +103,18 @@ public class FarmerCertificateController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to update farmer renewing requet certificate status", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/declinefmrenewingrequestcert/{fmCertId}")
+    public ResponseEntity declineFmRenewingReqCert (@PathVariable("fmCertId") String fmCertId) {
+        try {
+            System.out.println("DECLINE FARMER RENEWING REQUET CERT");
+            FarmerCertificate farmerCertificate = farmerCertificateService.declineFmRenewingRequetCertStatus(fmCertId);
+            return new ResponseEntity<>(farmerCertificate, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("DECLINE to update farmer renewing requet certificate status", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

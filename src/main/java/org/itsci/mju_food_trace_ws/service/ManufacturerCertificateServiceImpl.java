@@ -37,6 +37,13 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
     }
 
     @Override
+    public ManufacturerCertificate declineMnCertRegistStatus(String manuftId) {
+        ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getManufacturerCertificateByManufacturer_ManuftId(manuftId);
+        manufacturerCertificate.setMnCertStatus("ปฎิเสธ");
+        return manufacturerCertificateRepository.save(manufacturerCertificate);
+    }
+
+    @Override
     public ManufacturerCertificate getLatestManufacturerCertificateByManufacturerUsername(String username) {
         return manufacturerCertificateRepository.getLatestManufacturerCertificateByManufacturerUsername(username);
     }
@@ -81,6 +88,11 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         String newFileName = System.currentTimeMillis() + ".png";
         file.transferTo(new File(MANUFACTURER_CERT_FOLDER_PATH + newFileName));
         return MANUFACTURER_CERT_FOLDER_PATH + newFileName;
+    }
+
+    @Override
+    public ManufacturerCertificate getManufacturerCertificateById(String mnCertId) {
+        return manufacturerCertificateRepository.getReferenceById(mnCertId);
     }
 
     @Override

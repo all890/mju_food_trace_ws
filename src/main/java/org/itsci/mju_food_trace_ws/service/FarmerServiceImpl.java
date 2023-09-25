@@ -107,6 +107,14 @@ public class FarmerServiceImpl implements FarmerService {
     }
 
     @Override
+    public Farmer declineFmRegistStatus(String farmerId) {
+        Farmer farmer = farmerRepository.getReferenceById(farmerId);
+        farmer.setFarmerRegStatus("ปฎิเสธ");
+        farmerCertificateService.updateFmCertRegistStatusDecline(farmerId);
+        return farmerRepository.save(farmer);
+    }
+
+    @Override
     public FarmerCertificate getFarmerDetails(String farmerId) {
         FarmerCertificate farmerCertificate = farmerCertificateRepository.getFarmerCertificateByFarmer_FarmerId(farmerId);
         return farmerCertificate;

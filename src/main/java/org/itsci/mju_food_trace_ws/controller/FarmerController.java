@@ -63,6 +63,17 @@ public class FarmerController {
             return new ResponseEntity<>("Failed to update farmer registration status", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/declinefmregiststat/{farmerId}")
+    public ResponseEntity declineFmRegistStatus (@PathVariable("farmerId") String farmerId) {
+        try {
+            System.out.println("DECLINE FARMER REGIST STAT");
+            Farmer farmer = farmerService.declineFmRegistStatus(farmerId);
+            return new ResponseEntity<>(farmer, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to decline farmer registration status", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping("/getfmbyusername/{username}")
     public ResponseEntity getFarmerUsername (@PathVariable("username") String username) {
         try {

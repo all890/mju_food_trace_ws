@@ -14,6 +14,7 @@ public interface ManufacturerService {
     List<Manufacturer> getManufacturersByRegistStat();
     Manufacturer getManufacturerById(String manuftId);
     Manufacturer updateMnRegistStatus(String manuftId);
+    Manufacturer declineMnRegistStatus(String manuftId);
     ManufacturerCertificate getManufacturerDetails(String manuftId);
     Manufacturer saveManufacturer(Map<String, String> map) throws ParseException;
     Manufacturer updateManufacturer(Manufacturer manufacturer);

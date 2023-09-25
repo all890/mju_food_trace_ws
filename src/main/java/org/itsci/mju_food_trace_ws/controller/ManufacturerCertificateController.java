@@ -70,4 +70,14 @@ public class ManufacturerCertificateController {
             return new ResponseEntity<>("Failed to save manufacturer certificate data.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/getmncertdetails/{mnCertId}")
+    public ResponseEntity getManufactuerCertificateDetails (@PathVariable("mnCertId") String mnCertId) {
+        try {
+            ManufacturerCertificate manufacturerCertificate = manufacturerCertificateService.getManufacturerCertificateById(mnCertId);
+            return new ResponseEntity<>(manufacturerCertificate , HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get manufacturer certificate details", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -114,11 +114,24 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         farmerCertificate.setFmCertStatus("อนุมัติ");
         return farmerCertificateRepository.save(farmerCertificate);
     }
+    @Override
+    public FarmerCertificate updateFmCertRegistStatusDecline(String farmerId) {
+        FarmerCertificate farmerCertificate = farmerCertificateRepository.getFarmerCertificateByFarmer_FarmerId(farmerId);
+        farmerCertificate.setFmCertStatus("ปฎิเสธ");
+        return farmerCertificateRepository.save(farmerCertificate);
+    }
 
     @Override
     public FarmerCertificate updateFmRenewingRequetCertStatus(String fmCertId) {
         FarmerCertificate farmerCertificate = farmerCertificateRepository.getReferenceById(fmCertId);
         farmerCertificate.setFmCertStatus("อนุมัติ");
+        return farmerCertificateRepository.save(farmerCertificate);
+    }
+
+    @Override
+    public FarmerCertificate declineFmRenewingRequetCertStatus(String fmCertId) {
+        FarmerCertificate farmerCertificate = farmerCertificateRepository.getReferenceById(fmCertId);
+        farmerCertificate.setFmCertStatus("ปฎิเสธ");
         return farmerCertificateRepository.save(farmerCertificate);
     }
 
