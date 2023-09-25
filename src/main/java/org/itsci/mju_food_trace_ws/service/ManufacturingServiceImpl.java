@@ -3,6 +3,7 @@ package org.itsci.mju_food_trace_ws.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.Manufacturing;
+import org.itsci.mju_food_trace_ws.model.Planting;
 import org.itsci.mju_food_trace_ws.model.Product;
 import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
 import org.itsci.mju_food_trace_ws.repository.ManufacturingRepository;
@@ -105,14 +106,62 @@ public class ManufacturingServiceImpl implements ManufacturingService {
     public Manufacturing recordManufacturing(String manufacturingId) throws JsonProcessingException, NoSuchAlgorithmException {
         Manufacturing manufacturing = manufacturingRepository.getReferenceById(manufacturingId);
 
-        String jsonStr = new ObjectMapper().writeValueAsString(manufacturing);
+        Planting planting = manufacturing.getRawMaterialShipping().getPlanting();
+        RawMaterialShipping rawMaterialShipping = manufacturing.getRawMaterialShipping();
+
+        //First step : checking the current hash of planting
+        String tempPtCurrHash = planting.getPtCurrBlockHash();
+        planting.setPtCurrBlockHash(null);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(planting);
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
-        String encodedManuftCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+        String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash);
 
-        manufacturing.setManuftCurrBlockHash(encodedManuftCurrBlockHash);
+        System.out.println("1 OLD HASH : " + tempPtCurrHash);
+        System.out.println("1 NEW HASH : " + encodedPtCurrBlockHash);
 
-        return manufacturingRepository.save(manufacturing);
+        if (tempPtCurrHash.equals(encodedPtCurrBlockHash)) {
+            if (rawMaterialShipping.getRmsPrevBlockHash().equals(tempPtCurrHash)) {
+                planting.setPtCurrBlockHash(tempPtCurrHash);
+
+                String tempRmsCurrHash = rawMaterialShipping.getRmsCurrBlockHash();
+                rawMaterialShipping.setRmsCurrBlockHash(null);
+
+                String jsonStr2 = new ObjectMapper().writeValueAsString(rawMaterialShipping);
+                MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+                byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+                String encodedPtCurrBlockHash2 = Base64.getEncoder().encodeToString(hash2);
+
+                System.out.println("3 OLD HASH : " + tempRmsCurrHash);
+                System.out.println("3 NEW HASH : " + encodedPtCurrBlockHash2);
+
+                if (tempRmsCurrHash.equals(encodedPtCurrBlockHash2)) {
+                    if (manufacturing.getManuftPrevBlockHash().equals(tempRmsCurrHash)) {
+                        String jsonStr3 = new ObjectMapper().writeValueAsString(manufacturing);
+                        MessageDigest digest3 = MessageDigest.getInstance("SHA-256");
+                        byte[] hash3 = digest3.digest(jsonStr3.getBytes(StandardCharsets.UTF_8));
+                        String encodedManuftCurrBlockHash = Base64.getEncoder().encodeToString(hash3);
+
+                        manufacturing.setManuftCurrBlockHash(encodedManuftCurrBlockHash);
+
+                        return manufacturingRepository.save(manufacturing);
+                    } else {
+                        System.out.println("ERROR FOURTH FLOOR!");
+                        return null;
+                    }
+                } else {
+                    System.out.println("ERROR THIRD FLOOR!");
+                    return null;
+                }
+            } else {
+                System.out.println("ERROR SECOND FLOOR!");
+                return null;
+            }
+        } else {
+            System.out.println("ERROR FIRST FLOOR!");
+            return null;
+        }
     }
 
 
