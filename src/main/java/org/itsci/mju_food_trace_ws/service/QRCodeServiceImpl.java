@@ -26,10 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class QRCodeServiceImpl implements QRCodeService {
@@ -47,14 +44,31 @@ public class QRCodeServiceImpl implements QRCodeService {
         Manufacturing manufacturing = manufacturingRepository.getReferenceById(manufacturingId);
         Date generateDate = new Date();
 
+        /*
         String maxQRCodeId = qrCodeRepository.getMaxQRCodeId();
         long maxQRCodeLong = 0;
 
         if (maxQRCodeId != null) {
-            maxQRCodeLong = Long.parseLong(maxQRCodeId.substring(2));
+            maxQRCodeLong = Long.parseLong(maxQRCodeId.substring(4));
+        }
+        */
+
+        String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        // Create a StringBuilder to build the random string
+        StringBuilder randomStringBuilder = new StringBuilder();
+
+        // Create an instance of the Random class
+        Random random = new Random();
+
+        // Generate random characters and append them to the StringBuilder
+        for (int i = 0; i < 10; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            char randomChar = characters.charAt(randomIndex);
+            randomStringBuilder.append(randomChar);
         }
 
-        String qrcodeId = generateQRCodeId(maxQRCodeLong + 1);
+        String qrcodeId = randomStringBuilder.toString();
 
         String qrcodeImg = generateQRCodeImage(qrcodeId);
 
@@ -210,10 +224,10 @@ public class QRCodeServiceImpl implements QRCodeService {
 
     public String generateQRCodeId (long rawId) {
         String result = Long.toString(rawId);
-        while (result.length() < 8) {
+        while (result.length() < 6) {
             result = "0" + result;
         }
-        result = "QR" + result;
+        result = "FTQR" + result;
         return result;
     }
 }

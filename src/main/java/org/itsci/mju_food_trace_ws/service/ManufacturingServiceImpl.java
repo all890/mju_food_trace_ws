@@ -138,6 +138,9 @@ public class ManufacturingServiceImpl implements ManufacturingService {
 
                 if (tempRmsCurrHash.equals(encodedPtCurrBlockHash2)) {
                     if (manufacturing.getManuftPrevBlockHash().equals(tempRmsCurrHash)) {
+
+                        rawMaterialShipping.setRmsCurrBlockHash(tempRmsCurrHash);
+
                         String jsonStr3 = new ObjectMapper().writeValueAsString(manufacturing);
                         MessageDigest digest3 = MessageDigest.getInstance("SHA-256");
                         byte[] hash3 = digest3.digest(jsonStr3.getBytes(StandardCharsets.UTF_8));
