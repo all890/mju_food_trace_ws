@@ -71,9 +71,9 @@ public class PlantingServiceImpl implements PlantingService {
         String plantingMethod = map.get("plantingMethod");
         double netQuantity = Double.parseDouble(map.get("netQuantity"));
         String netQuantityUnit = map.get("netQuantityUnit");
-        int squareMeters = Integer.parseInt(map.get("squareMeters"));
-        int squareYards = Integer.parseInt(map.get("squareYards"));
-        int rai = Integer.parseInt(map.get("rai"));
+        double squareMeters = Double.parseDouble(map.get("squareMeters"));
+        double squareYards = Double.parseDouble(map.get("squareYards"));
+        double rai = Double.parseDouble(map.get("rai"));
         String username = map.get("username");
         String ptPrevBlockHash = "0";
         String ptCurrBlockHash = map.get("ptCurrBlockHash");

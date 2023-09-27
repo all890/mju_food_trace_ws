@@ -35,11 +35,11 @@ public class Planting {
 
     private String netQuantityUnit;
 
-    private int squareMeters;
+    private double squareMeters;
 
-    private int squareYards;
+    private double squareYards;
 
-    private int rai;
+    private double rai;
 
     private String ptPrevBlockHash;
 
@@ -49,7 +49,7 @@ public class Planting {
     @JoinColumn(name = "farmerId")
     private Farmer farmer;
 
-    public Planting(String plantingId, String plantName, Date plantDate, String plantingImg, String bioextract, Date approxHarvDate, String plantingMethod, double netQuantity, String netQuantityUnit, int squareMeters, int squareYards, int rai, String ptPrevBlockHash, Farmer farmer) {
+    public Planting(String plantingId, String plantName, Date plantDate, String plantingImg, String bioextract, Date approxHarvDate, String plantingMethod, double netQuantity, String netQuantityUnit, double squareMeters, double squareYards, double rai, String ptPrevBlockHash, Farmer farmer) {
         this.plantingId = plantingId;
         this.plantName = plantName;
         this.plantDate = plantDate;
