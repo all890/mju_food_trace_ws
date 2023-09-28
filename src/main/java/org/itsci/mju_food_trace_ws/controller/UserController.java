@@ -35,7 +35,13 @@ public class UserController {
         try {
             User user = userService.userLogin(map);
             if (user != null) {
-                return new ResponseEntity<>(user, HttpStatus.OK);
+                if ("WAIT TO ACCEPT".equals(user.getUserType())) {
+                    return new ResponseEntity<>("This user is waiting for accepting from administrator", HttpStatus.BAD_REQUEST);
+                } else if ("NOT ACCEPT".equals(user.getUserType())) {
+                    return new ResponseEntity<>("This user was rejected from administrator", HttpStatus.CONFLICT);
+                } else {
+                    return new ResponseEntity<>(user, HttpStatus.OK);
+                }
             } else {
                 return new ResponseEntity<>("This user wasn't found in the database", HttpStatus.FORBIDDEN);
             }
