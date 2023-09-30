@@ -130,6 +130,12 @@ public class ManufacturerServiceImpl implements ManufacturerService {
         return manufacturerRepository.getManufacturerByUser_Username(username);
     }
 
+    @Override
+    public boolean isManufacturerAvailable(String manuftName) {
+        Manufacturer manufacturer = manufacturerRepository.getManufacturerByManuftNameEquals(manuftName);
+        return manufacturer != null;
+    }
+
     public String generateManufacturerId (long rawId) {
         String result = Long.toString(rawId);
         while (result.length() < 8) {

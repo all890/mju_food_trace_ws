@@ -20,4 +20,5 @@ public interface ManufacturerService {
     Manufacturer updateManufacturer(Manufacturer manufacturer);
     void deleteManufacturer(String manuftId);
     Manufacturer getManufacturerByUsername(String username);
+    boolean isManufacturerAvailable (String manuftName);
 }

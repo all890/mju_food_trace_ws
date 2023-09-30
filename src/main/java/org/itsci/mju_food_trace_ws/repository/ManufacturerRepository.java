@@ -11,4 +11,6 @@ public interface ManufacturerRepository extends JpaRepository<Manufacturer, Stri
     List<Manufacturer> getManufacturersByManuftRegStatus (String farmerRegStatus);
 
     Manufacturer getManufacturerByUser_Username (String username);
+
+    Manufacturer getManufacturerByManuftNameEquals (String manuftName);
 }

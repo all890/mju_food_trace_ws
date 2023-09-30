@@ -97,4 +97,19 @@ public class ManufacturerController {
         }
     }
 
+    @GetMapping("/ismanuftavailable/{manuftName}")
+    public ResponseEntity isManufacturerAvailable (@PathVariable("manuftName") String manuftName) {
+        try {
+            System.out.println(manuftName);
+            if (manufacturerService.isManufacturerAvailable(manuftName)) {
+                return new ResponseEntity<>("Found manufacturer by manuftname", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Not found manufacturer by manuftname", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get manufacturer by manuftname", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
