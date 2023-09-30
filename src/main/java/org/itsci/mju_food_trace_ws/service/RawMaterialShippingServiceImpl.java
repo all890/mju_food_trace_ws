@@ -165,6 +165,33 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
   }
 
   @Override
+  public double getRemainNetQtyFromManufacturingByManufacturingId(String manufacturingId) {
+
+    double sumRmsQty = 0.0;
+    double sumUsedRawMatQty = 0.0;
+
+    double mainQty = 0.0;
+
+    Manufacturing manufacturing = manufacturingRepository.getReferenceById(manufacturingId);
+
+    mainQty = manufacturing.getUsedRawMatQtyUnit().equals("กิโลกรัม") ? manufacturing.getUsedRawMatQty() * 1000.0 : manufacturing.getUsedRawMatQty();
+
+    RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(manufacturing.getRawMaterialShipping().getRawMatShpId());
+    List<Manufacturing> manufacturings = manufacturingRepository.getManufacturingsByRawMaterialShipping_RawMatShpId(rawMaterialShipping.getRawMatShpId());
+
+    sumRmsQty = rawMaterialShipping.getRawMatShpQtyUnit().equals("กิโลกรัม") ? rawMaterialShipping.getRawMatShpQty() * 1000.0 : rawMaterialShipping.getRawMatShpQty();
+    for (Manufacturing m : manufacturings) {
+      if (m.getUsedRawMatQtyUnit().equals("กิโลกรัม")) {
+        sumUsedRawMatQty += m.getUsedRawMatQty() * 1000.0;
+      } else {
+        sumUsedRawMatQty += m.getUsedRawMatQty();
+      }
+    }
+
+    return sumRmsQty - sumUsedRawMatQty + mainQty;
+  }
+
+  @Override
   public boolean isRmsAndPlantingChainValid(String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException {
     RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(rawMatShpId);
 

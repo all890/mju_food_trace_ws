@@ -69,6 +69,17 @@ public class RawMaterialShippingController {
         }
     }
 
+    @GetMapping("/getremqtyofrmsindiv/{manufacturingId}")
+    public ResponseEntity getRemQtyOfRmsByManufacturingId (@PathVariable("manufacturingId") String manufacturingId) {
+        try {
+            double sumRms = rawMaterialShippingService.getRemainNetQtyFromManufacturingByManufacturingId(manufacturingId);
+            return new ResponseEntity<>(sumRms, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get remaining qty of rms", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/getrmsdetails/{rawMatShpId}")
     public ResponseEntity getRawMaterialShippingDetails(@PathVariable("rawMatShpId") String rawMatShpId) {
         try {

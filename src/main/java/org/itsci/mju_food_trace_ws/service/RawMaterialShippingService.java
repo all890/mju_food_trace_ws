@@ -16,6 +16,7 @@ public interface RawMaterialShippingService {
     RawMaterialShipping getRawMaterialShippingById(String rawMatShpId);
     Map<String, String> getRmsExistingByManufacturerUsername (String username);
     Map<String, Double> getRemainNetQtyOfRmsByManufacturerUsername (String username);
+    double getRemainNetQtyFromManufacturingByManufacturingId (String manufacturingId);
     boolean isRmsAndPlantingChainValid(String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException;
     String testGetHash (String rawMatShpId) throws NoSuchAlgorithmException, JsonProcessingException;
 }
