@@ -1,5 +1,7 @@
 package org.itsci.mju_food_trace_ws.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.Manufacturer;
 import org.itsci.mju_food_trace_ws.model.Manufacturing;
 import org.itsci.mju_food_trace_ws.model.Product;
@@ -9,6 +11,10 @@ import org.itsci.mju_food_trace_ws.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product addProduct(Map<String, String> map) {
+    public Product addProduct(Map<String, String> map) throws JsonProcessingException, NoSuchAlgorithmException {
 
         Manufacturer manufacturer = manufacturerRepository.getManufacturerByUser_Username(map.get("username"));
 
@@ -69,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
         int calcium = Integer.parseInt(map.get("calcium"));
 
         Product product = new Product(productId, productName, netVolume, netEnergy, saturatedFat, cholesterol,
-                protein, sodium, fiber, sugar, vitA, vitB1, vitB2, iron, calcium, manufacturer);
+                protein, sodium, fiber, sugar, vitA, vitB1, vitB2, iron, calcium, manufacturer.getMnCurrBlockHash(), null, manufacturer);
 
         return productRepository.save(product);
     }

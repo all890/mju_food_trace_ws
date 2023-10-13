@@ -29,6 +29,22 @@ public class FarmerController {
         }
     }
 
+    @RequestMapping("/isfmmobileavailable/{farmerMobileNo}")
+    public ResponseEntity isFarmerMobileNoAvailable (@PathVariable("farmerMobileNo") String farmerMobileNo) {
+        try {
+            Farmer farmer = farmerService.getFarmerByFarmerMobileNo(farmerMobileNo);
+            if (farmer != null) {
+                System.out.println("FM MOBILE NO WAS USED!");
+                return new ResponseEntity<>("This farmer mobile no was used", HttpStatus.NOT_ACCEPTABLE);
+            } else {
+                System.out.println("FM MOBILE NO IS AVAILABLE!");
+                return new ResponseEntity<>("This farmer mobile no is available", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get farmer's mobile no", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/getfmdetails/{farmerId}")
     public ResponseEntity getFarmerDetails (@PathVariable("farmerId") String farmerId) {

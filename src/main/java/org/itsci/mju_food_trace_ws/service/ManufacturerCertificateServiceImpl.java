@@ -1,5 +1,7 @@
 package org.itsci.mju_food_trace_ws.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.*;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerCertificateRepository;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerRepository;
@@ -9,14 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ManufacturerCertificateServiceImpl implements ManufacturerCertificateService {
@@ -29,10 +31,21 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
 
     @Autowired
     private ManufacturerRepository manufacturerRepository;
+
     @Override
-    public ManufacturerCertificate updateMnCertRegistStatus(String manuftId) {
+    public ManufacturerCertificate updateMnCertRegistStatus(String manuftId, String mnCurrBlockHash) throws JsonProcessingException, NoSuchAlgorithmException {
         ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getManufacturerCertificateByManufacturer_ManuftId(manuftId);
         manufacturerCertificate.setMnCertStatus("อนุมัติ");
+        manufacturerCertificate.setMnCertPrevBlockHash(mnCurrBlockHash);
+
+        //TODO: Generate current block hash by not using user data
+        String jsonStr2 = new ObjectMapper().writeValueAsString(manufacturerCertificate);
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+        String encodedMnCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
+
+        manufacturerCertificate.setMnCertCurrBlockHash(encodedMnCertCurrBlockHash);
+
         return manufacturerCertificateRepository.save(manufacturerCertificate);
     }
 
@@ -63,7 +76,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
     }
 
     @Override
-    public ManufacturerCertificate saveRequestManufacturerCertificate(Map<String, String> map) throws ParseException {
+    public ManufacturerCertificate saveRequestManufacturerCertificate(Map<String, String> map) throws ParseException, JsonProcessingException, NoSuchAlgorithmException {
         User user = null;
 
         ManufacturerCertificate manufacturerCertificate = null;
@@ -85,7 +98,15 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         Manufacturer manufacturer = manufacturerRepository.getManufacturerByUser_Username(username);
         String mnCertStatus = "รอการอนุมัติ";
 
-        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, manufacturer);
+        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, manufacturer.getMnCurrBlockHash(), null, manufacturer);
+
+        //TODO: Generate current block hash by not using user data
+        String jsonStr = new ObjectMapper().writeValueAsString(manufacturerCertificate);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+        String encodedMnCertCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+
+        manufacturerCertificate.setMnCertCurrBlockHash(encodedMnCertCurrBlockHash);
 
         //Save manufacturer certificate data to database by using farmer manager and get result message
         return manufacturerCertificateRepository.save(manufacturerCertificate);

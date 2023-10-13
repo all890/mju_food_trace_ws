@@ -1,5 +1,7 @@
 package org.itsci.mju_food_trace_ws.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.Farmer;
 import org.itsci.mju_food_trace_ws.model.FarmerCertificate;
 import org.itsci.mju_food_trace_ws.model.User;
@@ -8,13 +10,13 @@ import org.itsci.mju_food_trace_ws.repository.FarmerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FarmerServiceImpl implements FarmerService {
@@ -44,7 +46,7 @@ public class FarmerServiceImpl implements FarmerService {
     }
 
     @Override
-    public Farmer saveFarmer(Map<String, String> map) throws ParseException {
+    public Farmer saveFarmer(Map<String, String> map) throws ParseException, NoSuchAlgorithmException, JsonProcessingException {
 
         User user = null;
         Farmer farmer = null;
@@ -70,7 +72,8 @@ public class FarmerServiceImpl implements FarmerService {
         String farmLatitude = map.get("farmLatitude");
         String farmLongitude = map.get("farmLongitude");
 
-        farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, user);
+        //Farmer reg status, user must be null before
+        farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, "0", null, user);
 
         String fmCertId = farmerCertificateService.generateFarmerCertificateId(farmerCertificateRepository.count() + 1);
         String fmCertImg = map.get("fmCertImg");
@@ -85,7 +88,9 @@ public class FarmerServiceImpl implements FarmerService {
 
         String fmCertStatus = "รอการอนุมัติ";
 
-        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer);
+        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, null, null, farmer);
+
+        //farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
 
         farmerCertificateService.saveFarmerCertificate(farmerCertificate);
 
@@ -99,10 +104,23 @@ public class FarmerServiceImpl implements FarmerService {
     }
 
     @Override
-    public Farmer updateFmRegistStatus(String farmerId) {
+    public Farmer updateFmRegistStatus(String farmerId) throws JsonProcessingException, NoSuchAlgorithmException {
         Farmer farmer = farmerRepository.getReferenceById(farmerId);
         farmer.setFarmerRegStatus("อนุมัติ");
-        farmerCertificateService.updateFmCertRegistStatus(farmerId);
+
+        User tempUser = farmer.getUser();
+        farmer.setUser(null);
+
+        //TODO: Generate current block hash by not using user data
+        String jsonStr = new ObjectMapper().writeValueAsString(farmer);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+        String encodedFmCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+
+        farmer.setFmCurrBlockHash(encodedFmCurrBlockHash);
+        farmer.setUser(tempUser);
+
+        farmerCertificateService.updateFmCertRegistStatus(farmerId, encodedFmCurrBlockHash);
         return farmerRepository.save(farmer);
     }
 
@@ -129,6 +147,11 @@ public class FarmerServiceImpl implements FarmerService {
     @Override
     public Farmer getFarmerByUsername(String username) {
         return farmerRepository.getFarmerByUser_Username(username);
+    }
+
+    @Override
+    public Farmer getFarmerByFarmerMobileNo(String farmerMobileNo) {
+        return farmerRepository.getFarmerByFarmerMobileNo(farmerMobileNo);
     }
 
     public String generateFarmerId (long rawId) {

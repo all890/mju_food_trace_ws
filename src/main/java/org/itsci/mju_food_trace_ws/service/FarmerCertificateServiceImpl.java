@@ -1,5 +1,7 @@
 package org.itsci.mju_food_trace_ws.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.Farmer;
 import org.itsci.mju_food_trace_ws.model.FarmerCertificate;
 import org.itsci.mju_food_trace_ws.model.User;
@@ -11,14 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FarmerCertificateServiceImpl implements FarmerCertificateService {
@@ -47,7 +49,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     }
 
     @Override
-    public FarmerCertificate saveRequestFarmerCertificate(Map<String, String> map) throws ParseException {
+    public FarmerCertificate saveRequestFarmerCertificate(Map<String, String> map) throws ParseException, JsonProcessingException, NoSuchAlgorithmException {
 
         User user = null;
 
@@ -77,7 +79,15 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         // farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, user);
 
 
-        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer);
+        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer.getFmCurrBlockHash(), null, farmer);
+
+        //TODO: Generate current block hash by not using user data
+        String jsonStr = new ObjectMapper().writeValueAsString(farmerCertificate);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+        String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+
+        farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
 
         //farmerCertificateService.saveFarmerCertificate(farmerCertificate);
 
@@ -109,9 +119,19 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     }
 
     @Override
-    public FarmerCertificate updateFmCertRegistStatus(String farmerId) {
+    public FarmerCertificate updateFmCertRegistStatus(String farmerId, String fmCurrBlockHash) throws JsonProcessingException, NoSuchAlgorithmException {
         FarmerCertificate farmerCertificate = farmerCertificateRepository.getFarmerCertificateByFarmer_FarmerId(farmerId);
         farmerCertificate.setFmCertStatus("อนุมัติ");
+        farmerCertificate.setFmCertPrevBlockHash(fmCurrBlockHash);
+
+        //TODO: Generate current block hash by not using user data
+        String jsonStr2 = new ObjectMapper().writeValueAsString(farmerCertificate);
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+        String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
+
+        farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
+
         return farmerCertificateRepository.save(farmerCertificate);
     }
     @Override

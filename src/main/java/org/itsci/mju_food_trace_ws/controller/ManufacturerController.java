@@ -97,6 +97,22 @@ public class ManufacturerController {
         }
     }
 
+    @RequestMapping("/ismnnameavailable/{manuftName}")
+    public ResponseEntity isManuftNameAvailable (@PathVariable("manuftName") String manuftName) {
+        try {
+            if (manufacturerService.isManufacturerAvailable(manuftName)) {
+                System.out.println("Can't use this manuft name because not available");
+                return new ResponseEntity<>("Can't use this manuft name because not available", HttpStatus.NOT_ACCEPTABLE);
+            } else {
+                System.out.println("Manuft name is available");
+                return new ResponseEntity<>("Manuft name is available", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get manuft by name", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/ismanuftavailable/{manuftName}")
     public ResponseEntity isManufacturerAvailable (@PathVariable("manuftName") String manuftName) {
         try {

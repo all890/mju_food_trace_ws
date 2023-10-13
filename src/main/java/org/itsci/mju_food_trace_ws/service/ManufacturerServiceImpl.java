@@ -1,5 +1,7 @@
 package org.itsci.mju_food_trace_ws.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.Manufacturer;
 import org.itsci.mju_food_trace_ws.model.ManufacturerCertificate;
 import org.itsci.mju_food_trace_ws.model.User;
@@ -8,13 +10,13 @@ import org.itsci.mju_food_trace_ws.repository.ManufacturerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ManufacturerServiceImpl implements ManufacturerService {
@@ -43,10 +45,23 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     }
 
     @Override
-    public Manufacturer updateMnRegistStatus(String manuftId) {
+    public Manufacturer updateMnRegistStatus(String manuftId) throws NoSuchAlgorithmException, JsonProcessingException {
         Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
         manufacturer.setManuftRegStatus("อนุมัติ");
-        manufacturerCertificateService.updateMnCertRegistStatus(manuftId);
+
+        User tempUser = manufacturer.getUser();
+        manufacturer.setUser(null);
+
+        //TODO: Generate current block hash by not using user data
+        String jsonStr2 = new ObjectMapper().writeValueAsString(manufacturer);
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+        String encodedMnCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
+
+        manufacturer.setMnCurrBlockHash(encodedMnCurrBlockHash);
+        manufacturer.setUser(tempUser);
+
+        manufacturerCertificateService.updateMnCertRegistStatus(manuftId, manufacturer.getMnCurrBlockHash());
         return manufacturerRepository.save(manufacturer);
     }
 
@@ -65,7 +80,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     }
 
     @Override
-    public Manufacturer saveManufacturer(Map<String, String> map) throws ParseException {
+    public Manufacturer saveManufacturer(Map<String, String> map) throws ParseException, JsonProcessingException, NoSuchAlgorithmException {
 
         System.out.println("SAVE MANUFACTURER!");
 
@@ -91,7 +106,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
         String factorySupName = map.get("factorySupName");
         String factorySupLastname = map.get("factorySupLastname");
 
-        manufacturer = new Manufacturer(manuftId, manuftName, manuftEmail, manuftRegDate, manuftRegStatus, factoryLatitude, factoryLongitude, factoryTelNo, factorySupName, factorySupLastname, user);
+        manufacturer = new Manufacturer(manuftId, manuftName, manuftEmail, manuftRegDate, manuftRegStatus, factoryLatitude, factoryLongitude, factoryTelNo, factorySupName, factorySupLastname, "0", null, user);
 
         //Manufacturer certificate session
         String mnCertId = manufacturerCertificateService.generateManufacturerCertificateId(manufacturerCertificateRepository.count() + 1);
@@ -107,7 +122,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
 
         String mnCertStatus = "รอการอนุมัติ";
 
-        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, manufacturer);
+        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, null, null, manufacturer);
 
         manufacturerCertificateService.saveManufacturerCertificate(manufacturerCertificate);
 

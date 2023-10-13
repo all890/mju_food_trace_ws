@@ -11,4 +11,6 @@ public interface FarmerRepository extends JpaRepository<Farmer, String> {
 
     Farmer getFarmerByUser_Username (String username);
 
+    Farmer getFarmerByFarmerMobileNo (String farmerMobileNo);
+
 }
