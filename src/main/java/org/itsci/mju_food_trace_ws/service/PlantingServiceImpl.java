@@ -1,8 +1,11 @@
 package org.itsci.mju_food_trace_ws.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.Farmer;
 import org.itsci.mju_food_trace_ws.model.Planting;
 import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
+import org.itsci.mju_food_trace_ws.model.User;
 import org.itsci.mju_food_trace_ws.repository.FarmerRepository;
 import org.itsci.mju_food_trace_ws.repository.PlantingRepository;
 import org.itsci.mju_food_trace_ws.repository.RawMaterialShippingRepository;
@@ -12,7 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,7 +53,7 @@ public class PlantingServiceImpl implements PlantingService {
     }
 
     @Override
-    public Planting savePlanting(Map<String, String> map) throws ParseException {
+    public Planting savePlanting(Map<String, String> map) throws ParseException, JsonProcessingException, NoSuchAlgorithmException {
         Planting planting = null;
 
         String maxPlantingId = plantingRepository.getMaxPlantingId();
@@ -75,12 +81,25 @@ public class PlantingServiceImpl implements PlantingService {
         double squareYards = Double.parseDouble(map.get("squareYards"));
         double rai = Double.parseDouble(map.get("rai"));
         String username = map.get("username");
-        String ptPrevBlockHash = "0";
-        String ptCurrBlockHash = map.get("ptCurrBlockHash");
 
         Farmer farmer = farmerRepository.getFarmerByUser_Username(username);
 
-        planting = new Planting(plantingId,plantName,plantDate,plantingImg,bioextract,approxHarvDate,plantingMethod,netQuantity,netQuantityUnit,squareMeters,squareYards,rai, ptPrevBlockHash, ptCurrBlockHash,farmer);
+        String ptPrevBlockHash = farmer.getFmCurrBlockHash();
+        //String ptCurrBlockHash = map.get("ptCurrBlockHash");
+
+        planting = new Planting(plantingId,plantName,plantDate,plantingImg,bioextract,approxHarvDate,plantingMethod,netQuantity,netQuantityUnit,squareMeters,squareYards,rai, ptPrevBlockHash, null,farmer);
+
+        User tempUser = planting.getFarmer().getUser();
+        planting.getFarmer().setUser(null);
+
+        String jsonStr2 = new ObjectMapper().writeValueAsString(planting);
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+        String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
+
+        planting.setPtCurrBlockHash(encodedPtCurrBlockHash);
+        planting.getFarmer().setUser(tempUser);
+
         return plantingRepository.save(planting);
     }
 
@@ -94,7 +113,7 @@ public class PlantingServiceImpl implements PlantingService {
         System.out.println("FILE NAME IS : " + file.getOriginalFilename());
         String newFileName = System.currentTimeMillis() + ".png";
         file.transferTo(new File(PLANTING_IMG_FOLDER_PATH + newFileName));
-        return PLANTING_IMG_FOLDER_PATH + newFileName;
+        return newFileName;
     }
 
     @Override

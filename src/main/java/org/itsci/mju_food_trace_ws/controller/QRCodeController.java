@@ -36,6 +36,8 @@ public class QRCodeController {
     public ResponseEntity getProductDetailsByQRCodeId (@PathVariable("qrcodeId") String qrcodeId) {
         try {
             QRCode qrCode = qrCodeService.getProductDetailsByQRCodeId(qrcodeId);
+            return new ResponseEntity<>(qrCode, HttpStatus.OK);
+            /*
             if (qrCode != null) {
                 if (qrCodeService.isWholeChainValid(qrCode)) {
                     return new ResponseEntity<>(qrCode, HttpStatus.OK);
@@ -45,6 +47,7 @@ public class QRCodeController {
             } else {
                 return new ResponseEntity<>("Not found qr code id!", HttpStatus.NOT_FOUND);
             }
+            */
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to product details by qr code!", HttpStatus.INTERNAL_SERVER_ERROR);

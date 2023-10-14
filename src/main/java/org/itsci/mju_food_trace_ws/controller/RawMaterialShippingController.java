@@ -24,11 +24,14 @@ public class RawMaterialShippingController {
     public ResponseEntity addRawMaterialShipping(@RequestBody Map<String, String> map) {
         try {
             RawMaterialShipping rawMaterialShipping = rawMaterialShippingService.addRawMaterialShipping(map);
+            return new ResponseEntity<>(rawMaterialShipping, HttpStatus.OK);
+            /*
             if (rawMaterialShipping != null) {
                 return new ResponseEntity<>(rawMaterialShipping, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Failed to add rms because sum rawMatShpQty greater than plantingNetQty", HttpStatus.resolve(480));
             }
+            */
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to add raw material shipping", HttpStatus.INTERNAL_SERVER_ERROR);

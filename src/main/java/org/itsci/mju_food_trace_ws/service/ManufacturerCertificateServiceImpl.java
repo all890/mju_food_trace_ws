@@ -38,6 +38,9 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         manufacturerCertificate.setMnCertStatus("อนุมัติ");
         manufacturerCertificate.setMnCertPrevBlockHash(mnCurrBlockHash);
 
+        User tempUser = manufacturerCertificate.getManufacturer().getUser();
+        manufacturerCertificate.getManufacturer().setUser(null);
+
         //TODO: Generate current block hash by not using user data
         String jsonStr2 = new ObjectMapper().writeValueAsString(manufacturerCertificate);
         MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
@@ -45,6 +48,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         String encodedMnCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
 
         manufacturerCertificate.setMnCertCurrBlockHash(encodedMnCertCurrBlockHash);
+        manufacturerCertificate.getManufacturer().setUser(tempUser);
 
         return manufacturerCertificateRepository.save(manufacturerCertificate);
     }
@@ -122,7 +126,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         System.out.println("FILE NAME IS : " + file.getOriginalFilename());
         String newFileName = System.currentTimeMillis() + ".png";
         file.transferTo(new File(MANUFACTURER_CERT_FOLDER_PATH + newFileName));
-        return MANUFACTURER_CERT_FOLDER_PATH + newFileName;
+        return newFileName;
     }
 
     @Override

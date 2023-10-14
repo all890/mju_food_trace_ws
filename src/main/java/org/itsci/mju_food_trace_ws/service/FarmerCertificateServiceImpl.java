@@ -81,6 +81,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
 
         farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer.getFmCurrBlockHash(), null, farmer);
 
+        /*
         //TODO: Generate current block hash by not using user data
         String jsonStr = new ObjectMapper().writeValueAsString(farmerCertificate);
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -88,6 +89,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash);
 
         farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
+         */
 
         //farmerCertificateService.saveFarmerCertificate(farmerCertificate);
 
@@ -96,11 +98,22 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     }
 
     @Override
+    public List<FarmerCertificate> getFmCertsByFarmerUsername(String username) {
+        return farmerCertificateRepository.getFarmerCertificatesByFarmer_User_Username(username);
+    }
+
+    @Override
+    public boolean hasFmCertWaitToAccept(String username) {
+        List<FarmerCertificate> farmerCertificates = farmerCertificateRepository.getFarmerCertificatesByFmCertStatusEquals("รอการอนุมัติ");
+        return farmerCertificates.size() > 0;
+    }
+
+    @Override
     public String uploadFarmerCertificate(MultipartFile file) throws IOException {
         System.out.println("FILE NAME IS : " + file.getOriginalFilename());
         String newFileName = System.currentTimeMillis() + ".png";
         file.transferTo(new File(FARMER_CERT_FOLDER_PATH + newFileName));
-        return FARMER_CERT_FOLDER_PATH + newFileName;
+        return newFileName;
     }
 
     @Override
@@ -124,13 +137,16 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         farmerCertificate.setFmCertStatus("อนุมัติ");
         farmerCertificate.setFmCertPrevBlockHash(fmCurrBlockHash);
 
-        //TODO: Generate current block hash by not using user data
+        User tempUser = farmerCertificate.getFarmer().getUser();
+        farmerCertificate.getFarmer().setUser(null);
+
         String jsonStr2 = new ObjectMapper().writeValueAsString(farmerCertificate);
         MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
         byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
         String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
 
         farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
+        farmerCertificate.getFarmer().setUser(tempUser);
 
         return farmerCertificateRepository.save(farmerCertificate);
     }
@@ -142,9 +158,23 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     }
 
     @Override
-    public FarmerCertificate updateFmRenewingRequetCertStatus(String fmCertId) {
+    public FarmerCertificate updateFmRenewingRequetCertStatus(String fmCertId) throws JsonProcessingException, NoSuchAlgorithmException {
         FarmerCertificate farmerCertificate = farmerCertificateRepository.getReferenceById(fmCertId);
         farmerCertificate.setFmCertStatus("อนุมัติ");
+
+        farmerCertificate.setFmCertPrevBlockHash(farmerCertificate.getFarmer().getFmCurrBlockHash());
+
+        User tempUser = farmerCertificate.getFarmer().getUser();
+        farmerCertificate.getFarmer().setUser(null);
+
+        String jsonStr2 = new ObjectMapper().writeValueAsString(farmerCertificate);
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+        String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
+
+        farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
+        farmerCertificate.getFarmer().setUser(tempUser);
+
         return farmerCertificateRepository.save(farmerCertificate);
     }
 
@@ -157,7 +187,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
 
     @Override
     public FarmerCertificate getLatestFarmerCertificateByFarmerUsername(String username) {
-        return farmerCertificateRepository.getLatestFarmerCertificateByFarmerUsername(username);
+        return farmerCertificateRepository.getLatestFarmerCertificateByFarmerUsername(username, "อนุมัติ");
     }
 
 }

@@ -33,11 +33,14 @@ public class ManufacturingController {
     public ResponseEntity recordManufacturing(@PathVariable("manufacturingId") String manufacturingId) {
         try {
             Manufacturing manufacturing = manufacturingService.recordManufacturing(manufacturingId);
+            return new ResponseEntity<>(manufacturing, HttpStatus.OK);
+            /*
             if (manufacturing != null) {
                 return new ResponseEntity<>(manufacturing, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Failed to save manufacturing data because new encryption code isn't match as original", HttpStatus.CONFLICT);
             }
+            */
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to save manufacturing data.", HttpStatus.INTERNAL_SERVER_ERROR);

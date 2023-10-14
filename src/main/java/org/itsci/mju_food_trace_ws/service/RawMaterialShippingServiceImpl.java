@@ -2,10 +2,7 @@ package org.itsci.mju_food_trace_ws.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.itsci.mju_food_trace_ws.model.Manufacturer;
-import org.itsci.mju_food_trace_ws.model.Manufacturing;
-import org.itsci.mju_food_trace_ws.model.Planting;
-import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
+import org.itsci.mju_food_trace_ws.model.*;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerRepository;
 import org.itsci.mju_food_trace_ws.repository.ManufacturingRepository;
 import org.itsci.mju_food_trace_ws.repository.PlantingRepository;
@@ -52,11 +49,40 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
 
     Planting planting = plantingRepository.getReferenceById(plantingId);
 
+    Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
+
+    User tempFmUser = planting.getFarmer().getUser();
+    User tempMnUser = manufacturer.getUser();
+
+    planting.getFarmer().setUser(null);
+    manufacturer.setUser(null);
+
+    String maxRawMatShpId = rawMaterialShippingRepository.getMaxRawMaterialShippingId();
+    long maxRmsLong = 0;
+
+    if (maxRawMatShpId != null) {
+      maxRmsLong = Long.parseLong(maxRawMatShpId.substring(3));
+    }
+    String rawMatShpId = generateRawMaterialShippingId(maxRmsLong + 1);
+
+    RawMaterialShipping rawMaterialShipping = new RawMaterialShipping(rawMatShpId, rawMatShpDate, rawMatShpQty, rawMatShpQtyUnit, planting.getPtCurrBlockHash(), null, planting, manufacturer);
+
+    String jsonStr2 = new ObjectMapper().writeValueAsString(rawMaterialShipping);
+    MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+    byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+    String encodedRmsCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
+
+    rawMaterialShipping.setRmsCurrBlockHash(encodedRmsCurrBlockHash);
+    rawMaterialShipping.getPlanting().getFarmer().setUser(tempFmUser);
+    rawMaterialShipping.getManufacturer().setUser(tempMnUser);
+
+    return rawMaterialShippingRepository.save(rawMaterialShipping);
     //First step: query all rms which have plantingId equals to determined plantingId
-    List<RawMaterialShipping> rmsContPtId = rawMaterialShippingRepository.getRawMaterialShippingsByPlanting_PlantingId(plantingId);
+    //List<RawMaterialShipping> rmsContPtId = rawMaterialShippingRepository.getRawMaterialShippingsByPlanting_PlantingId(plantingId);
 
-    double sumOfRmsGrams = 0;
+    //double sumOfRmsGrams = 0;
 
+    /*
     for (RawMaterialShipping rms : rmsContPtId) {
       if (rms.getRawMatShpQtyUnit().equals("กิโลกรัม")) {
         sumOfRmsGrams += rms.getRawMatShpQty() * 1000;
@@ -64,7 +90,9 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
         sumOfRmsGrams += rms.getRawMatShpQty();
       }
     }
+    */
 
+    /*
     double ptNetQtyGrams = 0;
 
     if (planting.getNetQuantityUnit().equals("กิโลกรัม")) {
@@ -108,6 +136,7 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
     } else {
       return null;
     }
+    */
 
   }
 

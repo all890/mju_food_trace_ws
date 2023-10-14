@@ -22,9 +22,12 @@ public interface FarmerCertificateService {
     String generateFarmerCertificateId (long rawId);
     FarmerCertificate updateFmCertRegistStatus(String farmerId, String fmCurrBlockHash) throws JsonProcessingException, NoSuchAlgorithmException;
     FarmerCertificate updateFmCertRegistStatusDecline(String farmerId);
-    FarmerCertificate updateFmRenewingRequetCertStatus(String fmCertId);
+    FarmerCertificate updateFmRenewingRequetCertStatus(String fmCertId) throws JsonProcessingException, NoSuchAlgorithmException;
     FarmerCertificate declineFmRenewingRequetCertStatus(String fmCertId);
     FarmerCertificate getLatestFarmerCertificateByFarmerUsername(String username);
     FarmerCertificate saveRequestFarmerCertificate(Map<String, String> map) throws ParseException, JsonProcessingException, NoSuchAlgorithmException;
 
+    List<FarmerCertificate> getFmCertsByFarmerUsername (String username);
+
+    boolean hasFmCertWaitToAccept (String username);
 }

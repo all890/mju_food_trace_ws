@@ -2,10 +2,7 @@ package org.itsci.mju_food_trace_ws.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.itsci.mju_food_trace_ws.model.Manufacturing;
-import org.itsci.mju_food_trace_ws.model.Planting;
-import org.itsci.mju_food_trace_ws.model.Product;
-import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
+import org.itsci.mju_food_trace_ws.model.*;
 import org.itsci.mju_food_trace_ws.repository.ManufacturingRepository;
 import org.itsci.mju_food_trace_ws.repository.ProductRepository;
 import org.itsci.mju_food_trace_ws.repository.RawMaterialShippingRepository;
@@ -106,9 +103,36 @@ public class ManufacturingServiceImpl implements ManufacturingService {
     public Manufacturing recordManufacturing(String manufacturingId) throws JsonProcessingException, NoSuchAlgorithmException {
         Manufacturing manufacturing = manufacturingRepository.getReferenceById(manufacturingId);
 
-        Planting planting = manufacturing.getRawMaterialShipping().getPlanting();
-        RawMaterialShipping rawMaterialShipping = manufacturing.getRawMaterialShipping();
+        //Planting planting = manufacturing.getRawMaterialShipping().getPlanting();
+        //RawMaterialShipping rawMaterialShipping = manufacturing.getRawMaterialShipping();
 
+        if (manufacturing.getProduct().getPdCurrBlockHash() == null) {
+            User tempUser = manufacturing.getProduct().getManufacturer().getUser();
+            manufacturing.getProduct().getManufacturer().setUser(null);
+
+            String jsonStr4 = new ObjectMapper().writeValueAsString(manufacturing.getProduct());
+            MessageDigest digest4 = MessageDigest.getInstance("SHA-256");
+            byte[] hash4 = digest4.digest(jsonStr4.getBytes(StandardCharsets.UTF_8));
+            String encodedPdCurrBlockHash = Base64.getEncoder().encodeToString(hash4);
+
+            manufacturing.getProduct().setPdCurrBlockHash(encodedPdCurrBlockHash);
+            manufacturing.getProduct().getManufacturer().setUser(tempUser);
+        }
+
+        User tempUser2 = manufacturing.getProduct().getManufacturer().getUser();
+        manufacturing.getProduct().getManufacturer().setUser(null);
+
+        String jsonStr3 = new ObjectMapper().writeValueAsString(manufacturing);
+        MessageDigest digest3 = MessageDigest.getInstance("SHA-256");
+        byte[] hash3 = digest3.digest(jsonStr3.getBytes(StandardCharsets.UTF_8));
+        String encodedManuftCurrBlockHash = Base64.getEncoder().encodeToString(hash3);
+
+        manufacturing.setManuftCurrBlockHash(encodedManuftCurrBlockHash);
+        manufacturing.getProduct().getManufacturer().setUser(tempUser2);
+
+        return manufacturingRepository.save(manufacturing);
+
+        /*
         //First step : checking the current hash of planting
         String tempPtCurrHash = planting.getPtCurrBlockHash();
         planting.setPtCurrBlockHash(null);
@@ -141,14 +165,7 @@ public class ManufacturingServiceImpl implements ManufacturingService {
 
                         rawMaterialShipping.setRmsCurrBlockHash(tempRmsCurrHash);
 
-                        String jsonStr3 = new ObjectMapper().writeValueAsString(manufacturing);
-                        MessageDigest digest3 = MessageDigest.getInstance("SHA-256");
-                        byte[] hash3 = digest3.digest(jsonStr3.getBytes(StandardCharsets.UTF_8));
-                        String encodedManuftCurrBlockHash = Base64.getEncoder().encodeToString(hash3);
 
-                        manufacturing.setManuftCurrBlockHash(encodedManuftCurrBlockHash);
-
-                        return manufacturingRepository.save(manufacturing);
                     } else {
                         System.out.println("ERROR FOURTH FLOOR!");
                         return null;
@@ -165,6 +182,7 @@ public class ManufacturingServiceImpl implements ManufacturingService {
             System.out.println("ERROR FIRST FLOOR!");
             return null;
         }
+        */
     }
 
 

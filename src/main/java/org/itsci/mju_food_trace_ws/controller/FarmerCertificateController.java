@@ -118,4 +118,29 @@ public class FarmerCertificateController {
         }
     }
 
+    @GetMapping("/getfmcertsbyusername/{username}")
+    public ResponseEntity getFmCertsByFarmerUsername (@PathVariable("username") String username) {
+        try {
+            List<FarmerCertificate> farmerCertificates = farmerCertificateService.getFmCertsByFarmerUsername(username);
+            return new ResponseEntity<>(farmerCertificates, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get fm certs by username", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/haswaittoacceptcert/{username}")
+    public ResponseEntity HasFmCertWaitToAccept (@PathVariable("username") String username) {
+        try {
+            if (farmerCertificateService.hasFmCertWaitToAccept(username)) {
+                return new ResponseEntity<>("This user has fm cert wait to accept", HttpStatus.CONFLICT);
+            } else {
+                return new ResponseEntity<>("This user hasn't any fm cert wait to accept", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to having cert wait to accept", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
