@@ -104,6 +104,30 @@ public class ManufacturerCertificateController {
             return new ResponseEntity<>("DECLINE to update manufacturer renewing requet certificate status", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/getmncertsbyusername/{username}")
+    public ResponseEntity getMnCertsByManufacturerUsername (@PathVariable("username") String username) {
+        try {
+            List<ManufacturerCertificate> manufacturerCertificates = manufacturerCertificateService.getMnCertsByManufacturerUsername(username);
+            return new ResponseEntity<>(manufacturerCertificates, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get mn certs by username", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/haswaittoacceptcert/{username}")
+    public ResponseEntity hasMnCertWaitToAccept (@PathVariable("username") String username) {
+        try {
+            if (manufacturerCertificateService.hasMnCertWaitToAccept(username)) {
+                return new ResponseEntity<>("This user has mn cert wait to accept", HttpStatus.CONFLICT);
+            } else {
+                return new ResponseEntity<>("This user hasn't any mn cert wait to accept", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to having cert wait to accept", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/getnewmncertcurrblockhash/{mnCertId}")
     public ResponseEntity getNewMnCertCurrBlockHash (@PathVariable("mnCertId") String mnCertId) {

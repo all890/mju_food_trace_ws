@@ -61,9 +61,22 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
     }
 
     @Override
-    public ManufacturerCertificate updateMnRenewingRequetCertStatus(String mnCertId) {
+    public ManufacturerCertificate updateMnRenewingRequetCertStatus(String mnCertId) throws JsonProcessingException, NoSuchAlgorithmException {
         ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getReferenceById(mnCertId);
         manufacturerCertificate.setMnCertStatus("อนุมัติ");
+
+        manufacturerCertificate.setMnCertPrevBlockHash(manufacturerCertificate.getManufacturer().getMnCurrBlockHash());
+
+        User tempUser = manufacturerCertificate.getManufacturer().getUser();
+        manufacturerCertificate.getManufacturer().setUser(null);
+
+        String jsonStr2 = new ObjectMapper().writeValueAsString(manufacturerCertificate);
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
+        String encodedMnCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
+
+        manufacturerCertificate.setMnCertCurrBlockHash(encodedMnCertCurrBlockHash);
+        manufacturerCertificate.getManufacturer().setUser(tempUser);
         return manufacturerCertificateRepository.save(manufacturerCertificate);
     }
 
@@ -76,7 +89,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
 
     @Override
     public ManufacturerCertificate getLatestManufacturerCertificateByManufacturerUsername(String username) {
-        return manufacturerCertificateRepository.getLatestManufacturerCertificateByManufacturerUsername(username);
+        return manufacturerCertificateRepository.getLatestManufacturerCertificateByManufacturerUsername(username,"อนุมัติ");
     }
 
     @Override
@@ -114,6 +127,17 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
 
         //Save manufacturer certificate data to database by using farmer manager and get result message
         return manufacturerCertificateRepository.save(manufacturerCertificate);
+    }
+
+    @Override
+    public List<ManufacturerCertificate> getMnCertsByManufacturerUsername(String username) {
+        return manufacturerCertificateRepository.getManufacturerCertificateByManufacturer_User_Username(username);
+    }
+
+    @Override
+    public boolean hasMnCertWaitToAccept(String username) {
+        List<ManufacturerCertificate> manufacturerCertificates = manufacturerCertificateRepository.getManufacturerCertificatesByMnCertStatusEquals("รอการอนุมัติ");
+        return manufacturerCertificates.size() > 0;
     }
 
     @Override
