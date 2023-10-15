@@ -38,8 +38,10 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         manufacturerCertificate.setMnCertStatus("อนุมัติ");
         manufacturerCertificate.setMnCertPrevBlockHash(mnCurrBlockHash);
 
-        User tempUser = manufacturerCertificate.getManufacturer().getUser();
-        manufacturerCertificate.getManufacturer().setUser(null);
+        Manufacturer tempManufacturer = manufacturerCertificate.getManufacturer();
+        manufacturerCertificate.setManufacturer(null);
+        //User tempUser = manufacturerCertificate.getManufacturer().getUser();
+        //manufacturerCertificate.getManufacturer().setUser(null);
 
         //TODO: Generate current block hash by not using user data
         String jsonStr2 = new ObjectMapper().writeValueAsString(manufacturerCertificate);
@@ -48,7 +50,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         String encodedMnCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
 
         manufacturerCertificate.setMnCertCurrBlockHash(encodedMnCertCurrBlockHash);
-        manufacturerCertificate.getManufacturer().setUser(tempUser);
+        manufacturerCertificate.setManufacturer(tempManufacturer);
 
         return manufacturerCertificateRepository.save(manufacturerCertificate);
     }
@@ -67,8 +69,10 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
 
         manufacturerCertificate.setMnCertPrevBlockHash(manufacturerCertificate.getManufacturer().getMnCurrBlockHash());
 
-        User tempUser = manufacturerCertificate.getManufacturer().getUser();
-        manufacturerCertificate.getManufacturer().setUser(null);
+        Manufacturer tempManufacturer = manufacturerCertificate.getManufacturer();
+        manufacturerCertificate.setManufacturer(null);
+        //User tempUser = manufacturerCertificate.getManufacturer().getUser();
+        //manufacturerCertificate.getManufacturer().setUser(null);
 
         String jsonStr2 = new ObjectMapper().writeValueAsString(manufacturerCertificate);
         MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
@@ -76,7 +80,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         String encodedMnCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
 
         manufacturerCertificate.setMnCertCurrBlockHash(encodedMnCertCurrBlockHash);
-        manufacturerCertificate.getManufacturer().setUser(tempUser);
+        manufacturerCertificate.setManufacturer(tempManufacturer);
         return manufacturerCertificateRepository.save(manufacturerCertificate);
     }
 
@@ -117,6 +121,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
 
         manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, manufacturer.getMnCurrBlockHash(), null, manufacturer);
 
+        /*
         //TODO: Generate current block hash by not using user data
         String jsonStr = new ObjectMapper().writeValueAsString(manufacturerCertificate);
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -124,6 +129,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         String encodedMnCertCurrBlockHash = Base64.getEncoder().encodeToString(hash);
 
         manufacturerCertificate.setMnCertCurrBlockHash(encodedMnCertCurrBlockHash);
+        */
 
         //Save manufacturer certificate data to database by using farmer manager and get result message
         return manufacturerCertificateRepository.save(manufacturerCertificate);
@@ -143,7 +149,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
     @Override
     public String getNewMnCertCurrBlockHash(String mnCertId) throws JsonProcessingException, NoSuchAlgorithmException {
         ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getReferenceById(mnCertId);
-        manufacturerCertificate.getManufacturer().setUser(null);
+        manufacturerCertificate.setManufacturer(null);
         manufacturerCertificate.setMnCertCurrBlockHash(null);
 
         String jsonStr = new ObjectMapper().writeValueAsString(manufacturerCertificate);

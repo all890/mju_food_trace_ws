@@ -107,8 +107,8 @@ public class ManufacturingServiceImpl implements ManufacturingService {
         //RawMaterialShipping rawMaterialShipping = manufacturing.getRawMaterialShipping();
 
         if (manufacturing.getProduct().getPdCurrBlockHash() == null) {
-            User tempUser = manufacturing.getProduct().getManufacturer().getUser();
-            manufacturing.getProduct().getManufacturer().setUser(null);
+            Manufacturer tempManufacturer = manufacturing.getProduct().getManufacturer();
+            manufacturing.getProduct().setManufacturer(null);
 
             String jsonStr4 = new ObjectMapper().writeValueAsString(manufacturing.getProduct());
             MessageDigest digest4 = MessageDigest.getInstance("SHA-256");
@@ -116,14 +116,14 @@ public class ManufacturingServiceImpl implements ManufacturingService {
             String encodedPdCurrBlockHash = Base64.getEncoder().encodeToString(hash4);
 
             manufacturing.getProduct().setPdCurrBlockHash(encodedPdCurrBlockHash);
-            manufacturing.getProduct().getManufacturer().setUser(tempUser);
+            manufacturing.getProduct().setManufacturer(tempManufacturer);
         }
 
-        User tempUser2 = manufacturing.getProduct().getManufacturer().getUser();
-        manufacturing.getProduct().getManufacturer().setUser(null);
+        Product tempProduct = manufacturing.getProduct();
+        manufacturing.setProduct(null);
 
-        User tempUser = manufacturing.getRawMaterialShipping().getPlanting().getFarmer().getUser();
-        manufacturing.getRawMaterialShipping().getPlanting().getFarmer().setUser(null);
+        RawMaterialShipping tempRms = manufacturing.getRawMaterialShipping();
+        manufacturing.setRawMaterialShipping(null);
 
         String jsonStr3 = new ObjectMapper().writeValueAsString(manufacturing);
         MessageDigest digest3 = MessageDigest.getInstance("SHA-256");
@@ -131,8 +131,8 @@ public class ManufacturingServiceImpl implements ManufacturingService {
         String encodedManuftCurrBlockHash = Base64.getEncoder().encodeToString(hash3);
 
         manufacturing.setManuftCurrBlockHash(encodedManuftCurrBlockHash);
-        manufacturing.getProduct().getManufacturer().setUser(tempUser2);
-        manufacturing.getRawMaterialShipping().getPlanting().getFarmer().setUser(tempUser);
+        manufacturing.setProduct(tempProduct);
+        manufacturing.setRawMaterialShipping(tempRms);
 
         return manufacturingRepository.save(manufacturing);
 
@@ -198,8 +198,8 @@ public class ManufacturingServiceImpl implements ManufacturingService {
     @Override
     public String getNewManuftCurrBlockHash(String manufacturingId) throws JsonProcessingException, NoSuchAlgorithmException {
         Manufacturing manufacturing = manufacturingRepository.getReferenceById(manufacturingId);
-        manufacturing.getProduct().getManufacturer().setUser(null);
-        manufacturing.getRawMaterialShipping().getPlanting().getFarmer().setUser(null);
+        manufacturing.setProduct(null);
+        manufacturing.setRawMaterialShipping(null);
         manufacturing.setManuftCurrBlockHash(null);
 
         String jsonStr = new ObjectMapper().writeValueAsString(manufacturing);

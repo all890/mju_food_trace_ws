@@ -86,8 +86,8 @@ public class PlantingServiceImpl implements PlantingService {
 
         planting = new Planting(plantingId,plantName,plantDate,plantingImg,bioextract,approxHarvDate,plantingMethod,netQuantity,netQuantityUnit,squareMeters,squareYards,rai, ptPrevBlockHash, null,farmer);
 
-        User tempUser = planting.getFarmer().getUser();
-        planting.getFarmer().setUser(null);
+        Farmer tempFarmer = planting.getFarmer();
+        planting.setFarmer(null);
 
         String jsonStr2 = new ObjectMapper().writeValueAsString(planting);
         MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
@@ -95,7 +95,7 @@ public class PlantingServiceImpl implements PlantingService {
         String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
 
         planting.setPtCurrBlockHash(encodedPtCurrBlockHash);
-        planting.getFarmer().setUser(tempUser);
+        planting.setFarmer(tempFarmer);
 
         return plantingRepository.save(planting);
     }
@@ -161,7 +161,7 @@ public class PlantingServiceImpl implements PlantingService {
     public String getNewPtCurrBlockHash(String plantingId) throws JsonProcessingException, NoSuchAlgorithmException {
         Planting planting = plantingRepository.getReferenceById(plantingId);
 
-        planting.getFarmer().setUser(null);
+        planting.setFarmer(null);
         planting.setPtCurrBlockHash(null);
 
         String jsonStr = new ObjectMapper().writeValueAsString(planting);

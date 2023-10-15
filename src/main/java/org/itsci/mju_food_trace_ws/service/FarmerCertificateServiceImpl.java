@@ -112,7 +112,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     public String getNewFmCertCurrBlockHash(String fmCertId) throws JsonProcessingException, NoSuchAlgorithmException {
         FarmerCertificate farmerCertificate = farmerCertificateRepository.getReferenceById(fmCertId);
 
-        farmerCertificate.getFarmer().setUser(null);
+        farmerCertificate.setFarmer(null);
         farmerCertificate.setFmCertCurrBlockHash(null);
 
         String jsonStr = new ObjectMapper().writeValueAsString(farmerCertificate);
@@ -151,8 +151,10 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         farmerCertificate.setFmCertStatus("อนุมัติ");
         farmerCertificate.setFmCertPrevBlockHash(fmCurrBlockHash);
 
-        User tempUser = farmerCertificate.getFarmer().getUser();
-        farmerCertificate.getFarmer().setUser(null);
+        Farmer tempFarmer = farmerCertificate.getFarmer();
+        farmerCertificate.setFarmer(null);
+        //User tempUser = farmerCertificate.getFarmer().getUser();
+        //farmerCertificate.getFarmer().setUser(null);
 
         String jsonStr2 = new ObjectMapper().writeValueAsString(farmerCertificate);
         MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
@@ -160,7 +162,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
 
         farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
-        farmerCertificate.getFarmer().setUser(tempUser);
+        farmerCertificate.setFarmer(tempFarmer);
 
         return farmerCertificateRepository.save(farmerCertificate);
     }
@@ -178,8 +180,10 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
 
         farmerCertificate.setFmCertPrevBlockHash(farmerCertificate.getFarmer().getFmCurrBlockHash());
 
-        User tempUser = farmerCertificate.getFarmer().getUser();
-        farmerCertificate.getFarmer().setUser(null);
+        Farmer tempFarmer = farmerCertificate.getFarmer();
+        farmerCertificate.setFarmer(null);
+        //User tempUser = farmerCertificate.getFarmer().getUser();
+        //farmerCertificate.getFarmer().setUser(null);
 
         String jsonStr2 = new ObjectMapper().writeValueAsString(farmerCertificate);
         MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
@@ -187,7 +191,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
 
         farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
-        farmerCertificate.getFarmer().setUser(tempUser);
+        farmerCertificate.setFarmer(tempFarmer);
 
         return farmerCertificateRepository.save(farmerCertificate);
     }

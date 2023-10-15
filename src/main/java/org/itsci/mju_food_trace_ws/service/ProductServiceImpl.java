@@ -115,7 +115,7 @@ public class ProductServiceImpl implements ProductService {
     public String getNewPdCurrBlockHash(String productId) throws JsonProcessingException, NoSuchAlgorithmException {
         Product product = productRepository.getReferenceById(productId);
 
-        product.getManufacturer().setUser(null);
+        product.setManufacturer(null);
         product.setPdCurrBlockHash(null);
 
         String jsonStr = new ObjectMapper().writeValueAsString(product);

@@ -50,6 +50,18 @@ public class RawMaterialShippingController {
         }
     }
 
+    @RequestMapping("/listallsentagribyfmusername/{username}")
+    public ResponseEntity getListAllSentAgriByFarmerUsername(@PathVariable("username") String username) {
+
+        try {
+            List<RawMaterialShipping> rawMaterialShippings = rawMaterialShippingService.getListAllSentAgriByFarmerUsername(username);
+            return new ResponseEntity<>(rawMaterialShippings, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get list all sent agricultural products", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/getrmsexists/{username}")
     public ResponseEntity getRmsExistInManufacturingByManutftUsername (@PathVariable("username") String username) {
         try {
