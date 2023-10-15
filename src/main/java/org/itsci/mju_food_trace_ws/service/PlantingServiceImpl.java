@@ -2,10 +2,7 @@ package org.itsci.mju_food_trace_ws.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.itsci.mju_food_trace_ws.model.Farmer;
-import org.itsci.mju_food_trace_ws.model.Planting;
-import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
-import org.itsci.mju_food_trace_ws.model.User;
+import org.itsci.mju_food_trace_ws.model.*;
 import org.itsci.mju_food_trace_ws.repository.FarmerRepository;
 import org.itsci.mju_food_trace_ws.repository.PlantingRepository;
 import org.itsci.mju_food_trace_ws.repository.RawMaterialShippingRepository;
@@ -158,6 +155,20 @@ public class PlantingServiceImpl implements PlantingService {
         Planting planting = plantingRepository.getReferenceById(plantingId);
         planting.setFarmer(null);
         plantingRepository.delete(planting);
+    }
+
+    @Override
+    public String getNewPtCurrBlockHash(String plantingId) throws JsonProcessingException, NoSuchAlgorithmException {
+        Planting planting = plantingRepository.getReferenceById(plantingId);
+
+        planting.getFarmer().setUser(null);
+        planting.setPtCurrBlockHash(null);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(planting);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+        return Base64.getEncoder().encodeToString(hash);
     }
 
     public String generatePlantingId (long rawId) {

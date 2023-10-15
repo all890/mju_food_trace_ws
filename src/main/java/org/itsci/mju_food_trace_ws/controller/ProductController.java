@@ -107,4 +107,15 @@ public class ProductController {
         System.out.println(encoded);
     }
 
+    @GetMapping("/getnewpdcurrblockhash/{productId}")
+    public ResponseEntity getNewManuftCurrBlockHash (@PathVariable("productId") String productId) {
+        try {
+            String newPdCurrBlockHash = productService.getNewPdCurrBlockHash(productId);
+            return new ResponseEntity<>(newPdCurrBlockHash, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get new fm curr block hash.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

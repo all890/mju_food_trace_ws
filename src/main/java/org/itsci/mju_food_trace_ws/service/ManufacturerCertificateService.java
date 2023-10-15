@@ -27,4 +27,5 @@ public interface ManufacturerCertificateService {
     ManufacturerCertificate declineMnRenewingRequetCertStatus(String mnCertId);
     ManufacturerCertificate getLatestManufacturerCertificateByManufacturerUsername(String username);
     ManufacturerCertificate saveRequestManufacturerCertificate(Map<String, String> map) throws ParseException, JsonProcessingException, NoSuchAlgorithmException;
+    String getNewMnCertCurrBlockHash (String mnCertId) throws JsonProcessingException, NoSuchAlgorithmException;
 }

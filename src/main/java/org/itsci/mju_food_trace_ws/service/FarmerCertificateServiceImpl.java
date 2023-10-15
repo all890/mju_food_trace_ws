@@ -109,6 +109,20 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     }
 
     @Override
+    public String getNewFmCertCurrBlockHash(String fmCertId) throws JsonProcessingException, NoSuchAlgorithmException {
+        FarmerCertificate farmerCertificate = farmerCertificateRepository.getReferenceById(fmCertId);
+
+        farmerCertificate.getFarmer().setUser(null);
+        farmerCertificate.setFmCertCurrBlockHash(null);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(farmerCertificate);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+        return Base64.getEncoder().encodeToString(hash);
+    }
+
+    @Override
     public String uploadFarmerCertificate(MultipartFile file) throws IOException {
         System.out.println("FILE NAME IS : " + file.getOriginalFilename());
         String newFileName = System.currentTimeMillis() + ".png";

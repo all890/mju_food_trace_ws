@@ -16,5 +16,6 @@ public interface ProductService {
     Product updateProduct (Product product);
     Map<String, String> getProductExistingByManufacturerUsername (String username);
     void deleteProduct (String productId);
+    String getNewPdCurrBlockHash (String productId) throws JsonProcessingException, NoSuchAlgorithmException;
 
 }

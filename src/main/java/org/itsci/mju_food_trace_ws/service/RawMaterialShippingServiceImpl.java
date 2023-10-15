@@ -284,6 +284,20 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
     return encodedPtCurrBlockHash;
   }
 
+  @Override
+  public String getNewRmsCurrBlockHash(String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException {
+    RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(rawMatShpId);
+    rawMaterialShipping.getPlanting().getFarmer().setUser(null);
+    rawMaterialShipping.getManufacturer().setUser(null);
+    rawMaterialShipping.setRmsCurrBlockHash(null);
+
+    String jsonStr = new ObjectMapper().writeValueAsString(rawMaterialShipping);
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+    return Base64.getEncoder().encodeToString(hash);
+  }
+
   public String generateRawMaterialShippingId (long rawId) {
     String result = Long.toString(rawId);
     while (result.length() < 8) {

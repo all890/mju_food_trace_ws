@@ -122,6 +122,9 @@ public class ManufacturingServiceImpl implements ManufacturingService {
         User tempUser2 = manufacturing.getProduct().getManufacturer().getUser();
         manufacturing.getProduct().getManufacturer().setUser(null);
 
+        User tempUser = manufacturing.getRawMaterialShipping().getPlanting().getFarmer().getUser();
+        manufacturing.getRawMaterialShipping().getPlanting().getFarmer().setUser(null);
+
         String jsonStr3 = new ObjectMapper().writeValueAsString(manufacturing);
         MessageDigest digest3 = MessageDigest.getInstance("SHA-256");
         byte[] hash3 = digest3.digest(jsonStr3.getBytes(StandardCharsets.UTF_8));
@@ -129,6 +132,7 @@ public class ManufacturingServiceImpl implements ManufacturingService {
 
         manufacturing.setManuftCurrBlockHash(encodedManuftCurrBlockHash);
         manufacturing.getProduct().getManufacturer().setUser(tempUser2);
+        manufacturing.getRawMaterialShipping().getPlanting().getFarmer().setUser(tempUser);
 
         return manufacturingRepository.save(manufacturing);
 
@@ -189,6 +193,20 @@ public class ManufacturingServiceImpl implements ManufacturingService {
     @Override
     public List<Manufacturing> getListAllManufacturingByUsername(String username) {
         return manufacturingRepository.getManufacturingsByProduct_Manufacturer_User_Username(username);
+    }
+
+    @Override
+    public String getNewManuftCurrBlockHash(String manufacturingId) throws JsonProcessingException, NoSuchAlgorithmException {
+        Manufacturing manufacturing = manufacturingRepository.getReferenceById(manufacturingId);
+        manufacturing.getProduct().getManufacturer().setUser(null);
+        manufacturing.getRawMaterialShipping().getPlanting().getFarmer().setUser(null);
+        manufacturing.setManuftCurrBlockHash(null);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(manufacturing);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+        return Base64.getEncoder().encodeToString(hash);
     }
 
     public String generateManufacturingId (long rawId) {

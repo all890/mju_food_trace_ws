@@ -23,4 +23,5 @@ public interface ManufacturerService {
     void deleteManufacturer(String manuftId);
     Manufacturer getManufacturerByUsername(String username);
     boolean isManufacturerAvailable (String manuftName);
+    String getNewMnCurrBlockHash (String manuftId) throws JsonProcessingException, NoSuchAlgorithmException;
 }

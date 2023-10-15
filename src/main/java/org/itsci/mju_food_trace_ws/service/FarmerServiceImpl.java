@@ -154,6 +154,19 @@ public class FarmerServiceImpl implements FarmerService {
         return farmerRepository.getFarmerByFarmerMobileNo(farmerMobileNo);
     }
 
+    @Override
+    public String getNewFmCurrBlockHash(String farmerId) throws JsonProcessingException, NoSuchAlgorithmException {
+        Farmer farmer = farmerRepository.getReferenceById(farmerId);
+        farmer.setUser(null);
+        farmer.setFmCurrBlockHash(null);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(farmer);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+        return Base64.getEncoder().encodeToString(hash);
+    }
+
     public String generateFarmerId (long rawId) {
         String result = Long.toString(rawId);
         while (result.length() < 8) {

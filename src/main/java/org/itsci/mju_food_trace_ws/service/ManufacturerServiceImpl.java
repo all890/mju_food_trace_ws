@@ -2,6 +2,7 @@ package org.itsci.mju_food_trace_ws.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.itsci.mju_food_trace_ws.model.Farmer;
 import org.itsci.mju_food_trace_ws.model.Manufacturer;
 import org.itsci.mju_food_trace_ws.model.ManufacturerCertificate;
 import org.itsci.mju_food_trace_ws.model.User;
@@ -149,6 +150,19 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     public boolean isManufacturerAvailable(String manuftName) {
         Manufacturer manufacturer = manufacturerRepository.getManufacturerByManuftNameEquals(manuftName);
         return manufacturer != null;
+    }
+
+    @Override
+    public String getNewMnCurrBlockHash(String manuftId) throws JsonProcessingException, NoSuchAlgorithmException {
+        Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
+        manufacturer.setUser(null);
+        manufacturer.setMnCurrBlockHash(null);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(manufacturer);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+        return Base64.getEncoder().encodeToString(hash);
     }
 
     public String generateManufacturerId (long rawId) {

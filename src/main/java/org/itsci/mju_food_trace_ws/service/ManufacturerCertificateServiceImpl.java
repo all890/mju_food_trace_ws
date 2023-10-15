@@ -117,6 +117,19 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
     }
 
     @Override
+    public String getNewMnCertCurrBlockHash(String mnCertId) throws JsonProcessingException, NoSuchAlgorithmException {
+        ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getReferenceById(mnCertId);
+        manufacturerCertificate.getManufacturer().setUser(null);
+        manufacturerCertificate.setMnCertCurrBlockHash(null);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(manufacturerCertificate);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+        return Base64.getEncoder().encodeToString(hash);
+    }
+
+    @Override
     public ManufacturerCertificate saveManufacturerCertificate(ManufacturerCertificate manufacturerCertificate) {
         return manufacturerCertificateRepository.save(manufacturerCertificate);
     }

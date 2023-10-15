@@ -130,7 +130,7 @@ public class FarmerCertificateController {
     }
 
     @GetMapping("/haswaittoacceptcert/{username}")
-    public ResponseEntity HasFmCertWaitToAccept (@PathVariable("username") String username) {
+    public ResponseEntity hasFmCertWaitToAccept (@PathVariable("username") String username) {
         try {
             if (farmerCertificateService.hasFmCertWaitToAccept(username)) {
                 return new ResponseEntity<>("This user has fm cert wait to accept", HttpStatus.CONFLICT);
@@ -140,6 +140,17 @@ public class FarmerCertificateController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to having cert wait to accept", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getnewfmcertcurrblockhash/{fmCertId}")
+    public ResponseEntity getNewFmCertCurrBlockHash (@PathVariable("fmCertId") String fmCertId) {
+        try {
+            String newFmCertCurrBlockHash = farmerCertificateService.getNewFmCertCurrBlockHash(fmCertId);
+            return new ResponseEntity<>(newFmCertCurrBlockHash, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get new fm cert curr block hash.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

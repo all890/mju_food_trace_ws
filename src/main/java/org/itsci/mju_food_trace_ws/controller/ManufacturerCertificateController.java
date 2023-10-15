@@ -104,4 +104,15 @@ public class ManufacturerCertificateController {
             return new ResponseEntity<>("DECLINE to update manufacturer renewing requet certificate status", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/getnewmncertcurrblockhash/{mnCertId}")
+    public ResponseEntity getNewMnCertCurrBlockHash (@PathVariable("mnCertId") String mnCertId) {
+        try {
+            String newMnCertCurrBlockHash = manufacturerCertificateService.getNewMnCertCurrBlockHash(mnCertId);
+            return new ResponseEntity<>(newMnCertCurrBlockHash, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get new fm curr block hash.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

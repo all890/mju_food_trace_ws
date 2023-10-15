@@ -121,4 +121,15 @@ public class PlantingController {
         }
     }
 
+    @GetMapping("/getnewptcurrblockhash/{plantingId}")
+    public ResponseEntity getNewPtCurrBlockHash (@PathVariable("plantingId") String plantingId) {
+        try {
+            String newFmCertCurrBlockHash = plantingService.getNewPtCurrBlockHash(plantingId);
+            return new ResponseEntity<>(newFmCertCurrBlockHash, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get new pt curr block hash.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

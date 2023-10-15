@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.Manufacturer;
 import org.itsci.mju_food_trace_ws.model.Manufacturing;
+import org.itsci.mju_food_trace_ws.model.Planting;
 import org.itsci.mju_food_trace_ws.model.Product;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerRepository;
 import org.itsci.mju_food_trace_ws.repository.ManufacturingRepository;
@@ -108,6 +109,20 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.getReferenceById(productId);
         product.setManufacturer(null);
         productRepository.delete(product);
+    }
+
+    @Override
+    public String getNewPdCurrBlockHash(String productId) throws JsonProcessingException, NoSuchAlgorithmException {
+        Product product = productRepository.getReferenceById(productId);
+
+        product.getManufacturer().setUser(null);
+        product.setPdCurrBlockHash(null);
+
+        String jsonStr = new ObjectMapper().writeValueAsString(product);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+        return Base64.getEncoder().encodeToString(hash);
     }
 
     public String generateProductId (long rawId) {

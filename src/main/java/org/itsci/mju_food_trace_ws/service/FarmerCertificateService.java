@@ -30,4 +30,6 @@ public interface FarmerCertificateService {
     List<FarmerCertificate> getFmCertsByFarmerUsername (String username);
 
     boolean hasFmCertWaitToAccept (String username);
+
+    String getNewFmCertCurrBlockHash (String fmCertId) throws JsonProcessingException, NoSuchAlgorithmException;
 }

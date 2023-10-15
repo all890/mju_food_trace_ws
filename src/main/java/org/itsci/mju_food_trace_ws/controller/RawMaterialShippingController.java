@@ -120,4 +120,15 @@ public class RawMaterialShippingController {
             return new ResponseEntity<>("Failed to get hash", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/getnewrmscurrblockhash/{rawMatShpId}")
+    public ResponseEntity getNewRmsCurrBlockHash (@PathVariable("rawMatShpId") String rawMatShpId) {
+        try {
+            String newRmsCurrBlockHash = rawMaterialShippingService.getNewRmsCurrBlockHash(rawMatShpId);
+            return new ResponseEntity<>(newRmsCurrBlockHash, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get new rms curr block hash.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
