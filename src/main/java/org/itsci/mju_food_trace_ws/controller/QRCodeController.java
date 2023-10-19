@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/qrcode")
@@ -32,6 +33,18 @@ public class QRCodeController {
         }
     }
 
+    @GetMapping("/ischainvalid/{qrcodeId}")
+    public ResponseEntity isWholeChainValid (@PathVariable("qrcodeId") String qrcodeId) {
+        try {
+            QRCode qrCode = qrCodeService.getProductDetailsByQRCodeId(qrcodeId);
+            Map<String, String> map = qrCodeService.isWholeChainValid(qrCode);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to validate chain!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/getproddetails/{qrcodeId}")
     public ResponseEntity getProductDetailsByQRCodeId (@PathVariable("qrcodeId") String qrcodeId) {
         try {
@@ -41,17 +54,6 @@ public class QRCodeController {
             } else {
                 return new ResponseEntity<>("Not found this product by qr code", HttpStatus.NOT_FOUND);
             }
-            /*
-            if (qrCode != null) {
-                if (qrCodeService.isWholeChainValid(qrCode)) {
-                    return new ResponseEntity<>(qrCode, HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>("Chain isn't valid", HttpStatus.CONFLICT);
-                }
-            } else {
-                return new ResponseEntity<>("Not found qr code id!", HttpStatus.NOT_FOUND);
-            }
-            */
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to product details by qr code!", HttpStatus.INTERNAL_SERVER_ERROR);

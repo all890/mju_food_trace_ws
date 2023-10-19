@@ -49,20 +49,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     public Manufacturer updateMnRegistStatus(String manuftId) throws NoSuchAlgorithmException, JsonProcessingException {
         Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
         manufacturer.setManuftRegStatus("อนุมัติ");
-
-        User tempUser = manufacturer.getUser();
-        manufacturer.setUser(null);
-
-        //TODO: Generate current block hash by not using user data
-        String jsonStr2 = new ObjectMapper().writeValueAsString(manufacturer);
-        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
-        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
-        String encodedMnCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
-
-        manufacturer.setMnCurrBlockHash(encodedMnCurrBlockHash);
-        manufacturer.setUser(tempUser);
-
-        manufacturerCertificateService.updateMnCertRegistStatus(manuftId, manufacturer.getMnCurrBlockHash());
+        manufacturerCertificateService.updateMnCertRegistStatus(manuftId);
         return manufacturerRepository.save(manufacturer);
     }
 
@@ -107,7 +94,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
         String factorySupName = map.get("factorySupName");
         String factorySupLastname = map.get("factorySupLastname");
 
-        manufacturer = new Manufacturer(manuftId, manuftName, manuftEmail, manuftRegDate, manuftRegStatus, factoryLatitude, factoryLongitude, factoryTelNo, factorySupName, factorySupLastname, "0", null, user);
+        manufacturer = new Manufacturer(manuftId, manuftName, manuftEmail, manuftRegDate, manuftRegStatus, factoryLatitude, factoryLongitude, factoryTelNo, factorySupName, factorySupLastname, user);
 
         //Manufacturer certificate session
         String mnCertId = manufacturerCertificateService.generateManufacturerCertificateId(manufacturerCertificateRepository.count() + 1);
@@ -123,7 +110,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
 
         String mnCertStatus = "รอการอนุมัติ";
 
-        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, null, null, manufacturer);
+        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, manufacturer);
 
         manufacturerCertificateService.saveManufacturerCertificate(manufacturerCertificate);
 
@@ -150,19 +137,6 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     public boolean isManufacturerAvailable(String manuftName) {
         Manufacturer manufacturer = manufacturerRepository.getManufacturerByManuftNameEquals(manuftName);
         return manufacturer != null;
-    }
-
-    @Override
-    public String getNewMnCurrBlockHash(String manuftId) throws JsonProcessingException, NoSuchAlgorithmException {
-        Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
-        manufacturer.setUser(null);
-        manufacturer.setMnCurrBlockHash(null);
-
-        String jsonStr = new ObjectMapper().writeValueAsString(manufacturer);
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
-
-        return Base64.getEncoder().encodeToString(hash);
     }
 
     public String generateManufacturerId (long rawId) {

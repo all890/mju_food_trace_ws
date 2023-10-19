@@ -24,5 +24,5 @@ public interface PlantingService {
     Map<String, Double> getRemainNetQtyOfPtsByFarmerUsername (String username);
     void deletePlanting(String plantingId);
 
-    String getNewPtCurrBlockHash (String plantingId) throws JsonProcessingException, NoSuchAlgorithmException;
+    String testGetNewPtCurrBlockHash (String plantingId) throws JsonProcessingException, NoSuchAlgorithmException;
 }

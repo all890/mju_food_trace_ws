@@ -128,15 +128,4 @@ public class ManufacturerController {
         }
     }
 
-    @GetMapping("/getnewmncurrblockhash/{manuftId}")
-    public ResponseEntity getNewMnCurrBlockHash (@PathVariable("manuftId") String manuftId) {
-        try {
-            String newMnCurrBlockHash = manufacturerService.getNewMnCurrBlockHash(manuftId);
-            return new ResponseEntity<>(newMnCurrBlockHash, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to get new fm curr block hash.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
 }

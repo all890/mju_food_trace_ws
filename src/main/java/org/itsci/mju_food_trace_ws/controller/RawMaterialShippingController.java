@@ -133,14 +133,26 @@ public class RawMaterialShippingController {
         }
     }
 
-    @GetMapping("/getnewrmscurrblockhash/{rawMatShpId}")
-    public ResponseEntity getNewRmsCurrBlockHash (@PathVariable("rawMatShpId") String rawMatShpId) {
+    @GetMapping("/acceptrms/{rawMatShpId}")
+    public ResponseEntity acceptRawMaterialShipping (@PathVariable("rawMatShpId") String rawMatShpId) {
         try {
-            String newRmsCurrBlockHash = rawMaterialShippingService.getNewRmsCurrBlockHash(rawMatShpId);
-            return new ResponseEntity<>(newRmsCurrBlockHash, HttpStatus.OK);
+            RawMaterialShipping rawMaterialShipping = rawMaterialShippingService.acceptRawMaterialShipping(rawMatShpId);
+            return new ResponseEntity<>(rawMaterialShipping, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Failed to get new rms curr block hash.", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Failed to accept rms", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/declinerms/{rawMatShpId}")
+    public ResponseEntity declineRawMaterialShipping (@PathVariable("rawMatShpId") String rawMatShpId) {
+        try {
+            RawMaterialShipping rawMaterialShipping = rawMaterialShippingService.declineRawMaterialShipping(rawMatShpId);
+            return new ResponseEntity<>(rawMaterialShipping, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to decline rms", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

@@ -33,6 +33,9 @@ public class PlantingServiceImpl implements PlantingService {
     @Autowired
     private RawMaterialShippingRepository rawMaterialShippingRepository;
 
+    @Autowired
+    private FarmerCertificateService farmerCertificateService;
+
     @Override
     public List<Planting> getAllPlanting() {
         return plantingRepository.findAll();
@@ -46,7 +49,7 @@ public class PlantingServiceImpl implements PlantingService {
     @Override
     public List<Planting> getListPlantingByFarmerUsername(String username) {
 
-        return plantingRepository.getPlantingsByFarmer_User_Username(username);
+        return plantingRepository.getPlantingsByFarmerCertificate_Farmer_User_Username(username);
     }
 
     @Override
@@ -79,15 +82,12 @@ public class PlantingServiceImpl implements PlantingService {
         double rai = Double.parseDouble(map.get("rai"));
         String username = map.get("username");
 
-        Farmer farmer = farmerRepository.getFarmerByUser_Username(username);
+        FarmerCertificate farmerCertificate = farmerCertificateService.getLatestFarmerCertificateByFarmerUsername(username);
 
-        String ptPrevBlockHash = farmer.getFmCurrBlockHash();
-        //String ptCurrBlockHash = map.get("ptCurrBlockHash");
+        planting = new Planting(plantingId,plantName,plantDate,plantingImg,bioextract,approxHarvDate,plantingMethod,netQuantity,netQuantityUnit,squareMeters,squareYards,rai, "0", null,farmerCertificate);
 
-        planting = new Planting(plantingId,plantName,plantDate,plantingImg,bioextract,approxHarvDate,plantingMethod,netQuantity,netQuantityUnit,squareMeters,squareYards,rai, ptPrevBlockHash, null,farmer);
-
-        Farmer tempFarmer = planting.getFarmer();
-        planting.setFarmer(null);
+        User tempUser = planting.getFarmerCertificate().getFarmer().getUser();
+        planting.getFarmerCertificate().getFarmer().setUser(null);
 
         String jsonStr2 = new ObjectMapper().writeValueAsString(planting);
         MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
@@ -95,7 +95,7 @@ public class PlantingServiceImpl implements PlantingService {
         String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
 
         planting.setPtCurrBlockHash(encodedPtCurrBlockHash);
-        planting.setFarmer(tempFarmer);
+        planting.getFarmerCertificate().getFarmer().setUser(tempUser);
 
         return plantingRepository.save(planting);
     }
@@ -126,7 +126,7 @@ public class PlantingServiceImpl implements PlantingService {
     @Override
     public Map<String, Double> getRemainNetQtyOfPtsByFarmerUsername(String username) {
         Map<String, Double> remNetQty = new HashMap<>();
-        List<Planting> plantings = plantingRepository.getPlantingsByFarmer_User_Username(username);
+        List<Planting> plantings = plantingRepository.getPlantingsByFarmerCertificate_Farmer_User_Username(username);
 
         for (Planting planting : plantings) {
             double sumOfRawMatShpQtyGrams = 0.0;
@@ -153,22 +153,21 @@ public class PlantingServiceImpl implements PlantingService {
     @Override
     public void deletePlanting(String plantingId) {
         Planting planting = plantingRepository.getReferenceById(plantingId);
-        planting.setFarmer(null);
+        planting.setFarmerCertificate(null);
         plantingRepository.delete(planting);
     }
 
     @Override
-    public String getNewPtCurrBlockHash(String plantingId) throws JsonProcessingException, NoSuchAlgorithmException {
+    public String testGetNewPtCurrBlockHash(String plantingId) throws JsonProcessingException, NoSuchAlgorithmException {
         Planting planting = plantingRepository.getReferenceById(plantingId);
-
-        planting.setFarmer(null);
+        planting.getFarmerCertificate().getFarmer().setUser(null);
         planting.setPtCurrBlockHash(null);
 
-        String jsonStr = new ObjectMapper().writeValueAsString(planting);
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+        String jsonStr2 = new ObjectMapper().writeValueAsString(planting);
+        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
+        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
 
-        return Base64.getEncoder().encodeToString(hash);
+        return Base64.getEncoder().encodeToString(hash2);
     }
 
     public String generatePlantingId (long rawId) {

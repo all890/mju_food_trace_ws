@@ -20,5 +20,8 @@ public interface RawMaterialShippingService {
     double getRemainNetQtyFromManufacturingByManufacturingId (String manufacturingId);
     boolean isRmsAndPlantingChainValid(String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException;
     String testGetHash (String rawMatShpId) throws NoSuchAlgorithmException, JsonProcessingException;
-    String getNewRmsCurrBlockHash (String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException;
+
+    RawMaterialShipping acceptRawMaterialShipping (String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException;
+
+    RawMaterialShipping declineRawMaterialShipping (String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException;
 }

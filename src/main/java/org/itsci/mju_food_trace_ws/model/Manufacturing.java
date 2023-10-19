@@ -43,4 +43,8 @@ public class Manufacturing {
     @JoinColumn(name = "productId")
     private Product product;
 
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "mnCertId")
+    private ManufacturerCertificate manufacturerCertificate;
+
 }

@@ -59,19 +59,7 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
     }
     String rawMatShpId = generateRawMaterialShippingId(maxRmsLong + 1);
 
-    RawMaterialShipping rawMaterialShipping = new RawMaterialShipping(rawMatShpId, rawMatShpDate, rawMatShpQty, rawMatShpQtyUnit, planting.getPtCurrBlockHash(), null, planting, manufacturer);
-
-    rawMaterialShipping.setPlanting(null);
-    rawMaterialShipping.setManufacturer(null);
-
-    String jsonStr2 = new ObjectMapper().writeValueAsString(rawMaterialShipping);
-    MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
-    byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
-    String encodedRmsCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
-
-    rawMaterialShipping.setRmsCurrBlockHash(encodedRmsCurrBlockHash);
-    rawMaterialShipping.setPlanting(planting);
-    rawMaterialShipping.setManufacturer(manufacturer);
+    RawMaterialShipping rawMaterialShipping = new RawMaterialShipping(rawMatShpId, rawMatShpDate, rawMatShpQty, rawMatShpQtyUnit, null, "กำลังส่ง", planting.getPtCurrBlockHash(), null, planting, manufacturer);
 
     return rawMaterialShippingRepository.save(rawMaterialShipping);
     //First step: query all rms which have plantingId equals to determined plantingId
@@ -144,7 +132,7 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
 
   @Override
   public List<RawMaterialShipping> getListAllSentAgriByFarmerUsername(String username) {
-    return rawMaterialShippingRepository.getRawMaterialShippingsByPlanting_Farmer_User_Username(username);
+    return rawMaterialShippingRepository.getRawMaterialShippingsByPlanting_FarmerCertificate_Farmer_User_Username(username);
   }
 
   @Override
@@ -287,17 +275,53 @@ public class RawMaterialShippingServiceImpl implements RawMaterialShippingServic
   }
 
   @Override
-  public String getNewRmsCurrBlockHash(String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException {
+  public RawMaterialShipping acceptRawMaterialShipping(String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException {
     RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(rawMatShpId);
-    rawMaterialShipping.setPlanting(null);
-    rawMaterialShipping.setManufacturer(null);
-    rawMaterialShipping.setRmsCurrBlockHash(null);
+    Date receiveDate = new Date();
+    rawMaterialShipping.setReceiveDate(receiveDate);
+    rawMaterialShipping.setStatus("สำเร็จ");
+
+    User tempFmUser = rawMaterialShipping.getPlanting().getFarmerCertificate().getFarmer().getUser();
+    User tempMnUser = rawMaterialShipping.getManufacturer().getUser();
+
+    rawMaterialShipping.getPlanting().getFarmerCertificate().getFarmer().setUser(null);
+    rawMaterialShipping.getManufacturer().setUser(null);
 
     String jsonStr = new ObjectMapper().writeValueAsString(rawMaterialShipping);
     MessageDigest digest = MessageDigest.getInstance("SHA-256");
     byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+    String encodedRmsCurrBlockHash = Base64.getEncoder().encodeToString(hash);
 
-    return Base64.getEncoder().encodeToString(hash);
+    rawMaterialShipping.setRmsCurrBlockHash(encodedRmsCurrBlockHash);
+    rawMaterialShipping.getPlanting().getFarmerCertificate().getFarmer().setUser(tempFmUser);
+    rawMaterialShipping.getManufacturer().setUser(tempMnUser);
+
+    return rawMaterialShippingRepository.save(rawMaterialShipping);
+  }
+
+  @Override
+  public RawMaterialShipping declineRawMaterialShipping(String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException {
+    RawMaterialShipping rawMaterialShipping = rawMaterialShippingRepository.getReferenceById(rawMatShpId);
+    Date receiveDate = new Date();
+    rawMaterialShipping.setReceiveDate(receiveDate);
+    rawMaterialShipping.setStatus("ถูกปฏิเสธ");
+
+    User tempFmUser = rawMaterialShipping.getPlanting().getFarmerCertificate().getFarmer().getUser();
+    User tempMnUser = rawMaterialShipping.getManufacturer().getUser();
+
+    rawMaterialShipping.getPlanting().getFarmerCertificate().getFarmer().setUser(null);
+    rawMaterialShipping.getManufacturer().setUser(null);
+
+    String jsonStr = new ObjectMapper().writeValueAsString(rawMaterialShipping);
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
+    String encodedRmsCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+
+    rawMaterialShipping.setRmsCurrBlockHash(encodedRmsCurrBlockHash);
+    rawMaterialShipping.getPlanting().getFarmerCertificate().getFarmer().setUser(tempFmUser);
+    rawMaterialShipping.getManufacturer().setUser(tempMnUser);
+
+    return rawMaterialShippingRepository.save(rawMaterialShipping);
   }
 
   public String generateRawMaterialShippingId (long rawId) {

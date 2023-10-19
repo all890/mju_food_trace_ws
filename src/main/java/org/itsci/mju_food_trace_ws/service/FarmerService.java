@@ -25,6 +25,4 @@ public interface FarmerService {
 
     Farmer getFarmerByFarmerMobileNo (String farmerMobileNo);
 
-    String getNewFmCurrBlockHash (String farmerId) throws JsonProcessingException, NoSuchAlgorithmException;
-
 }

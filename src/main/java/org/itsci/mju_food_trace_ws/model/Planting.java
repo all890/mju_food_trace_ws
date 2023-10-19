@@ -46,23 +46,7 @@ public class Planting {
     private String ptCurrBlockHash;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "farmerId")
-    private Farmer farmer;
+    @JoinColumn(name = "fmCertId")
+    private FarmerCertificate farmerCertificate;
 
-    public Planting(String plantingId, String plantName, Date plantDate, String plantingImg, String bioextract, Date approxHarvDate, String plantingMethod, double netQuantity, String netQuantityUnit, double squareMeters, double squareYards, double rai, String ptPrevBlockHash, Farmer farmer) {
-        this.plantingId = plantingId;
-        this.plantName = plantName;
-        this.plantDate = plantDate;
-        this.plantingImg = plantingImg;
-        this.bioextract = bioextract;
-        this.approxHarvDate = approxHarvDate;
-        this.plantingMethod = plantingMethod;
-        this.netQuantity = netQuantity;
-        this.netQuantityUnit = netQuantityUnit;
-        this.squareMeters = squareMeters;
-        this.squareYards = squareYards;
-        this.rai = rai;
-        this.ptPrevBlockHash = ptPrevBlockHash;
-        this.farmer = farmer;
-    }
 }

@@ -79,19 +79,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         // farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, user);
 
 
-        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer.getFmCurrBlockHash(), null, farmer);
-
-        /*
-        //TODO: Generate current block hash by not using user data
-        String jsonStr = new ObjectMapper().writeValueAsString(farmerCertificate);
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
-        String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash);
-
-        farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
-         */
-
-        //farmerCertificateService.saveFarmerCertificate(farmerCertificate);
+        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer);
 
         //Save farmer certificate data to database by using farmer manager and get result message
         return farmerCertificateRepository.save(farmerCertificate);
@@ -106,20 +94,6 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     public boolean hasFmCertWaitToAccept(String username) {
         List<FarmerCertificate> farmerCertificates = farmerCertificateRepository.getFarmerCertificatesByFmCertStatusEquals("รอการอนุมัติ");
         return farmerCertificates.size() > 0;
-    }
-
-    @Override
-    public String getNewFmCertCurrBlockHash(String fmCertId) throws JsonProcessingException, NoSuchAlgorithmException {
-        FarmerCertificate farmerCertificate = farmerCertificateRepository.getReferenceById(fmCertId);
-
-        farmerCertificate.setFarmer(null);
-        farmerCertificate.setFmCertCurrBlockHash(null);
-
-        String jsonStr = new ObjectMapper().writeValueAsString(farmerCertificate);
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
-
-        return Base64.getEncoder().encodeToString(hash);
     }
 
     @Override
@@ -146,24 +120,9 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     }
 
     @Override
-    public FarmerCertificate updateFmCertRegistStatus(String farmerId, String fmCurrBlockHash) throws JsonProcessingException, NoSuchAlgorithmException {
+    public FarmerCertificate updateFmCertRegistStatus(String farmerId) throws JsonProcessingException, NoSuchAlgorithmException {
         FarmerCertificate farmerCertificate = farmerCertificateRepository.getFarmerCertificateByFarmer_FarmerId(farmerId);
         farmerCertificate.setFmCertStatus("อนุมัติ");
-        farmerCertificate.setFmCertPrevBlockHash(fmCurrBlockHash);
-
-        Farmer tempFarmer = farmerCertificate.getFarmer();
-        farmerCertificate.setFarmer(null);
-        //User tempUser = farmerCertificate.getFarmer().getUser();
-        //farmerCertificate.getFarmer().setUser(null);
-
-        String jsonStr2 = new ObjectMapper().writeValueAsString(farmerCertificate);
-        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
-        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
-        String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
-
-        farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
-        farmerCertificate.setFarmer(tempFarmer);
-
         return farmerCertificateRepository.save(farmerCertificate);
     }
     @Override
@@ -177,22 +136,6 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     public FarmerCertificate updateFmRenewingRequetCertStatus(String fmCertId) throws JsonProcessingException, NoSuchAlgorithmException {
         FarmerCertificate farmerCertificate = farmerCertificateRepository.getReferenceById(fmCertId);
         farmerCertificate.setFmCertStatus("อนุมัติ");
-
-        farmerCertificate.setFmCertPrevBlockHash(farmerCertificate.getFarmer().getFmCurrBlockHash());
-
-        Farmer tempFarmer = farmerCertificate.getFarmer();
-        farmerCertificate.setFarmer(null);
-        //User tempUser = farmerCertificate.getFarmer().getUser();
-        //farmerCertificate.getFarmer().setUser(null);
-
-        String jsonStr2 = new ObjectMapper().writeValueAsString(farmerCertificate);
-        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
-        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
-        String encodedFmCertCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
-
-        farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
-        farmerCertificate.setFarmer(tempFarmer);
-
         return farmerCertificateRepository.save(farmerCertificate);
     }
 

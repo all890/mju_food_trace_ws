@@ -25,6 +25,10 @@ public class RawMaterialShipping {
 
     private String rawMatShpQtyUnit;
 
+    private Date receiveDate;
+
+    private String status;
+
     private String rmsPrevBlockHash;
 
     private String rmsCurrBlockHash;

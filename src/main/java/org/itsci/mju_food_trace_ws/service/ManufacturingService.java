@@ -21,6 +21,4 @@ public interface ManufacturingService {
     Manufacturing recordManufacturing (String manufacturingId) throws JsonProcessingException, NoSuchAlgorithmException;
     List<Manufacturing> getListAllManufacturingByUsername(String username);
 
-    String getNewManuftCurrBlockHash (String manufacturingId) throws JsonProcessingException, NoSuchAlgorithmException;
-
 }

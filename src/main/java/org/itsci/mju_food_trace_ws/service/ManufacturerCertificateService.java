@@ -21,7 +21,7 @@ public interface ManufacturerCertificateService {
     Path downloadManufacturerCertificate(String filePath);
     List<ManufacturerCertificate> getManuftCertificatesByMnCertStatus(String mnCertStatus);
     String generateManufacturerCertificateId (long rawId);
-    ManufacturerCertificate updateMnCertRegistStatus(String manuftId, String mnCurrBlockHash) throws JsonProcessingException, NoSuchAlgorithmException;
+    ManufacturerCertificate updateMnCertRegistStatus(String manuftId) throws JsonProcessingException, NoSuchAlgorithmException;
     ManufacturerCertificate declineMnCertRegistStatus(String manuftId);
     ManufacturerCertificate updateMnRenewingRequetCertStatus(String mnCertId) throws JsonProcessingException, NoSuchAlgorithmException;
     ManufacturerCertificate declineMnRenewingRequetCertStatus(String mnCertId);
@@ -30,5 +30,5 @@ public interface ManufacturerCertificateService {
 
     List<ManufacturerCertificate> getMnCertsByManufacturerUsername (String username);
     boolean hasMnCertWaitToAccept (String username);
-    String getNewMnCertCurrBlockHash (String mnCertId) throws JsonProcessingException, NoSuchAlgorithmException;
+
 }

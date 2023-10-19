@@ -6,10 +6,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import org.itsci.mju_food_trace_ws.model.Manufacturing;
-import org.itsci.mju_food_trace_ws.model.Planting;
-import org.itsci.mju_food_trace_ws.model.QRCode;
-import org.itsci.mju_food_trace_ws.model.RawMaterialShipping;
+import org.itsci.mju_food_trace_ws.model.*;
 import org.itsci.mju_food_trace_ws.repository.ManufacturingRepository;
 import org.itsci.mju_food_trace_ws.repository.QRCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,75 +89,105 @@ public class QRCodeServiceImpl implements QRCodeService {
     }
 
     @Override
-    public boolean isWholeChainValid(QRCode qrCode) throws JsonProcessingException, NoSuchAlgorithmException {
+    public Map<String, String> isWholeChainValid(QRCode qrCode) throws JsonProcessingException, NoSuchAlgorithmException {
 
+        Map<String, String> incorrectData = new HashMap<>();
+
+        //Separate each blocks follow the order
         Planting planting = qrCode.getManufacturing().getRawMaterialShipping().getPlanting();
         RawMaterialShipping rawMaterialShipping = qrCode.getManufacturing().getRawMaterialShipping();
         Manufacturing manufacturing = qrCode.getManufacturing();
 
-        //First step : checking the current hash of planting
-        String tempPtCurrHash = planting.getPtCurrBlockHash();
+        //First floor, check planting current block hash
+        User tempFmUser = planting.getFarmerCertificate().getFarmer().getUser();
+        String oldPtCurrBlockHash = planting.getPtCurrBlockHash();
+        planting.getFarmerCertificate().getFarmer().setUser(null);
         planting.setPtCurrBlockHash(null);
 
         String jsonStr = new ObjectMapper().writeValueAsString(planting);
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
-        String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash);
+        String newPtCurrBlockHash = Base64.getEncoder().encodeToString(hash);
 
-        System.out.println("1 OLD HASH : " + tempPtCurrHash);
-        System.out.println("1 NEW HASH : " + encodedPtCurrBlockHash);
+        planting.getFarmerCertificate().getFarmer().setUser(tempFmUser);
+        planting.setPtCurrBlockHash(oldPtCurrBlockHash);
 
-        if (tempPtCurrHash.equals(encodedPtCurrBlockHash)) {
-            if (rawMaterialShipping.getRmsPrevBlockHash().equals(tempPtCurrHash)) {
-                planting.setPtCurrBlockHash(tempPtCurrHash);
-
-                String tempRmsCurrHash = rawMaterialShipping.getRmsCurrBlockHash();
+        //First floor checking (oldPtCurrBlockHash and newPtCurrBlockHash)
+        System.out.println("OLD PLANTING CURR BLOCK HASH : " + oldPtCurrBlockHash);
+        System.out.println("NEW PLANTING CURR BLOCK HASH : " + newPtCurrBlockHash);
+        if (oldPtCurrBlockHash.equals(newPtCurrBlockHash)) {
+            //Second floor checking (oldPtCurrBlockHash and rmsPrevBlockHash)
+            if (oldPtCurrBlockHash.equals(rawMaterialShipping.getRmsPrevBlockHash())) {
+                User tempFmUser2 = rawMaterialShipping.getPlanting().getFarmerCertificate().getFarmer().getUser();
+                User tempMnUser = rawMaterialShipping.getManufacturer().getUser();
+                String oldRmsCurrBlockHash = rawMaterialShipping.getRmsCurrBlockHash();
+                rawMaterialShipping.getPlanting().getFarmerCertificate().getFarmer().setUser(null);
+                rawMaterialShipping.getManufacturer().setUser(null);
                 rawMaterialShipping.setRmsCurrBlockHash(null);
 
                 String jsonStr2 = new ObjectMapper().writeValueAsString(rawMaterialShipping);
                 MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
                 byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
-                String encodedPtCurrBlockHash2 = Base64.getEncoder().encodeToString(hash2);
+                String newRmsCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
 
-                System.out.println("3 OLD HASH : " + tempRmsCurrHash);
-                System.out.println("3 NEW HASH : " + encodedPtCurrBlockHash2);
+                rawMaterialShipping.getPlanting().getFarmerCertificate().getFarmer().setUser(tempFmUser2);
+                rawMaterialShipping.getManufacturer().setUser(tempMnUser);
+                rawMaterialShipping.setRmsCurrBlockHash(oldRmsCurrBlockHash);
 
-                if (tempRmsCurrHash.equals(encodedPtCurrBlockHash2)) {
-                    if (manufacturing.getManuftPrevBlockHash().equals(tempRmsCurrHash)) {
-                        rawMaterialShipping.setRmsCurrBlockHash(tempRmsCurrHash);
-
-                        String tempManuftCurrHash = manufacturing.getManuftCurrBlockHash();
+                //Third floor checking (oldRmsCurrBlockHash and newRmsCurrBlockHash)
+                System.out.println("OLD RMS CURR BLOCK HASH : " + oldRmsCurrBlockHash);
+                System.out.println("NEW RMS CURR BLOCK HASH : " + newRmsCurrBlockHash);
+                if (oldRmsCurrBlockHash.equals(newRmsCurrBlockHash)) {
+                    //Fourth floor checking (oldRmsCurrBlockHash and manuftPrevBlockHash)
+                    if (oldRmsCurrBlockHash.equals(manufacturing.getManuftPrevBlockHash())) {
+                        User tempFmUser3 = manufacturing.getRawMaterialShipping().getPlanting().getFarmerCertificate().getFarmer().getUser();
+                        User tempMnUser2 = manufacturing.getProduct().getManufacturer().getUser();
+                        String oldManuftCurrBlockHash = manufacturing.getManuftCurrBlockHash();
+                        manufacturing.getRawMaterialShipping().getPlanting().getFarmerCertificate().getFarmer().setUser(null);
+                        manufacturing.getProduct().getManufacturer().setUser(null);
+                        manufacturing.getRawMaterialShipping().getManufacturer().setUser(null);
+                        manufacturing.getManufacturerCertificate().getManufacturer().setUser(null);
                         manufacturing.setManuftCurrBlockHash(null);
 
                         String jsonStr3 = new ObjectMapper().writeValueAsString(manufacturing);
                         MessageDigest digest3 = MessageDigest.getInstance("SHA-256");
                         byte[] hash3 = digest3.digest(jsonStr3.getBytes(StandardCharsets.UTF_8));
-                        String encodedPtCurrBlockHash3 = Base64.getEncoder().encodeToString(hash3);
+                        String newManuftCurrBlockHash = Base64.getEncoder().encodeToString(hash3);
 
-                        System.out.println("4 OLD HASH : " + tempManuftCurrHash);
-                        System.out.println("4 NEW HASH : " + encodedPtCurrBlockHash3);
+                        manufacturing.getRawMaterialShipping().getPlanting().getFarmerCertificate().getFarmer().setUser(tempFmUser3);
+                        manufacturing.getProduct().getManufacturer().setUser(tempMnUser2);
+                        manufacturing.getRawMaterialShipping().getManufacturer().setUser(tempMnUser2);
+                        manufacturing.getManufacturerCertificate().getManufacturer().setUser(tempMnUser2);
+                        manufacturing.setManuftCurrBlockHash(oldManuftCurrBlockHash);
 
-                        if (tempManuftCurrHash.equals(encodedPtCurrBlockHash3)) {
-                            return true;
+                        System.out.println("OLD MANUFT CURR BLOCK HASH : " + oldManuftCurrBlockHash);
+                        System.out.println("NEW MANUFT CURR BLOCK HASH : " + newManuftCurrBlockHash);
+                        if (oldManuftCurrBlockHash.equals(newManuftCurrBlockHash)) {
+                            return incorrectData;
                         } else {
-                            System.out.println("ERROR FIFTH FLOOR!");
-                            return false;
+                            incorrectData.put("5","MANUFACTURING CURRENT BLOCK HASH");
+                            System.out.println("MANUFACTURING CURRENT BLOCK HASH WAS TAMPERED");
+                            return incorrectData;
                         }
                     } else {
-                        System.out.println("ERROR FOURTH FLOOR!");
-                        return false;
+                        incorrectData.put("4","MANUFACTURING PREVIOUS BLOCK HASH");
+                        System.out.println("MANUFACTURING PREVIOUS BLOCK HASH WAS TAMPERED");
+                        return incorrectData;
                     }
                 } else {
-                    System.out.println("ERROR THIRD FLOOR!");
-                    return false;
+                    incorrectData.put("3","RMS CURRENT BLOCK HASH");
+                    System.out.println("RMS CURRENT BLOCK HASH WAS TAMPERED");
+                    return incorrectData;
                 }
             } else {
-                System.out.println("ERROR SECOND FLOOR!");
-                return false;
+                incorrectData.put("2","RMS PREVIOUS BLOCK HASH");
+                System.out.println("RMS PREVIOUS BLOCK HASH WAS TAMPERED");
+                return incorrectData;
             }
         } else {
-            System.out.println("ERROR FIRST FLOOR!");
-            return false;
+            incorrectData.put("1","PLANTING CURRENT BLOCK HASH");
+            System.out.println("PLANTING CURRENT BLOCK HASH WAS TAMPERED");
+            return incorrectData;
         }
 
     }

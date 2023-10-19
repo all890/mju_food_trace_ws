@@ -76,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
         int calcium = Integer.parseInt(map.get("calcium"));
 
         Product product = new Product(productId, productName, netVolume, netEnergy, saturatedFat, cholesterol,
-                protein, sodium, fiber, sugar, vitA, vitB1, vitB2, iron, calcium, manufacturer.getMnCurrBlockHash(), null, manufacturer);
+                protein, sodium, fiber, sugar, vitA, vitB1, vitB2, iron, calcium, manufacturer);
 
         return productRepository.save(product);
     }
@@ -109,20 +109,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.getReferenceById(productId);
         product.setManufacturer(null);
         productRepository.delete(product);
-    }
-
-    @Override
-    public String getNewPdCurrBlockHash(String productId) throws JsonProcessingException, NoSuchAlgorithmException {
-        Product product = productRepository.getReferenceById(productId);
-
-        product.setManufacturer(null);
-        product.setPdCurrBlockHash(null);
-
-        String jsonStr = new ObjectMapper().writeValueAsString(product);
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
-
-        return Base64.getEncoder().encodeToString(hash);
     }
 
     public String generateProductId (long rawId) {

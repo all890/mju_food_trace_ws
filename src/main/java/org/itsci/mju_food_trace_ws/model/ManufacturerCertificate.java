@@ -32,10 +32,6 @@ public class ManufacturerCertificate {
 
     private String mnCertStatus;
 
-    private String mnCertPrevBlockHash;
-
-    private String mnCertCurrBlockHash;
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "manuftId")
     private Manufacturer manufacturer;

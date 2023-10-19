@@ -73,7 +73,7 @@ public class FarmerServiceImpl implements FarmerService {
         String farmLongitude = map.get("farmLongitude");
 
         //Farmer reg status, user must be null before
-        farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, "0", null, user);
+        farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, user);
 
         String fmCertId = farmerCertificateService.generateFarmerCertificateId(farmerCertificateRepository.count() + 1);
         String fmCertImg = map.get("fmCertImg");
@@ -88,7 +88,7 @@ public class FarmerServiceImpl implements FarmerService {
 
         String fmCertStatus = "รอการอนุมัติ";
 
-        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, null, null, farmer);
+        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer);
 
         //farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
 
@@ -107,20 +107,7 @@ public class FarmerServiceImpl implements FarmerService {
     public Farmer updateFmRegistStatus(String farmerId) throws JsonProcessingException, NoSuchAlgorithmException {
         Farmer farmer = farmerRepository.getReferenceById(farmerId);
         farmer.setFarmerRegStatus("อนุมัติ");
-
-        User tempUser = farmer.getUser();
-        farmer.setUser(null);
-
-        //TODO: Generate current block hash by not using user data
-        String jsonStr = new ObjectMapper().writeValueAsString(farmer);
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
-        String encodedFmCurrBlockHash = Base64.getEncoder().encodeToString(hash);
-
-        farmer.setFmCurrBlockHash(encodedFmCurrBlockHash);
-        farmer.setUser(tempUser);
-
-        farmerCertificateService.updateFmCertRegistStatus(farmerId, encodedFmCurrBlockHash);
+        farmerCertificateService.updateFmCertRegistStatus(farmerId);
         return farmerRepository.save(farmer);
     }
 
@@ -152,19 +139,6 @@ public class FarmerServiceImpl implements FarmerService {
     @Override
     public Farmer getFarmerByFarmerMobileNo(String farmerMobileNo) {
         return farmerRepository.getFarmerByFarmerMobileNo(farmerMobileNo);
-    }
-
-    @Override
-    public String getNewFmCurrBlockHash(String farmerId) throws JsonProcessingException, NoSuchAlgorithmException {
-        Farmer farmer = farmerRepository.getReferenceById(farmerId);
-        farmer.setUser(null);
-        farmer.setFmCurrBlockHash(null);
-
-        String jsonStr = new ObjectMapper().writeValueAsString(farmer);
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(jsonStr.getBytes(StandardCharsets.UTF_8));
-
-        return Base64.getEncoder().encodeToString(hash);
     }
 
     public String generateFarmerId (long rawId) {

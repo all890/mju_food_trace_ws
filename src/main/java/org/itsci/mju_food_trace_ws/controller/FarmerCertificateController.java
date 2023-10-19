@@ -143,15 +143,4 @@ public class FarmerCertificateController {
         }
     }
 
-    @GetMapping("/getnewfmcertcurrblockhash/{fmCertId}")
-    public ResponseEntity getNewFmCertCurrBlockHash (@PathVariable("fmCertId") String fmCertId) {
-        try {
-            String newFmCertCurrBlockHash = farmerCertificateService.getNewFmCertCurrBlockHash(fmCertId);
-            return new ResponseEntity<>(newFmCertCurrBlockHash, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to get new fm cert curr block hash.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
 }

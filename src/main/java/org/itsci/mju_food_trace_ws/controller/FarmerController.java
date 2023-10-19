@@ -29,17 +29,6 @@ public class FarmerController {
         }
     }
 
-    @GetMapping("/getnewfmcurrblockhash/{farmerId}")
-    public ResponseEntity getNewFmCurrBlockHash (@PathVariable("farmerId") String farmerId) {
-        try {
-            String newFmCurrBlockHash = farmerService.getNewFmCurrBlockHash(farmerId);
-            return new ResponseEntity<>(newFmCurrBlockHash, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Failed to get new fm curr block hash.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @RequestMapping("/isfmmobileavailable/{farmerMobileNo}")
     public ResponseEntity isFarmerMobileNoAvailable (@PathVariable("farmerMobileNo") String farmerMobileNo) {
         try {

@@ -41,10 +41,6 @@ public class Farmer {
 
     private String farmLongitude;
 
-    private String fmPrevBlockHash;
-
-    private String fmCurrBlockHash;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username")
     private User user;

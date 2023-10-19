@@ -32,10 +32,6 @@ public class FarmerCertificate {
 
     private String fmCertStatus;
 
-    private String fmCertPrevBlockHash;
-
-    private String fmCertCurrBlockHash;
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "farmerId")
     private Farmer farmer;
