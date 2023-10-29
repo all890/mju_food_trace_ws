@@ -108,7 +108,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
         Date mnCertRegDate = format.parse(mnCertRegDateStr);
         Date mnCertExpireDate = format.parse(mnCertExpireDateStr);
 
-        String mnCertStatus = "รอการอนุมัติ";
+        String mnCertStatus = "รอการอนุมัติครั้งแรก";
 
         manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, manufacturer);
 

@@ -86,7 +86,7 @@ public class FarmerServiceImpl implements FarmerService {
         Date fmCertRegDate = format.parse(fmCertRegDateStr);
         Date fmCertExpireDate = format.parse(fmCertExpireDateStr);
 
-        String fmCertStatus = "รอการอนุมัติ";
+        String fmCertStatus = "รอการอนุมัติครั้งแรก";
 
         farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer);
 
