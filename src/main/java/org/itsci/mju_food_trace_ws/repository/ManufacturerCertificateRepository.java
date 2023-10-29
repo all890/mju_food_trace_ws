@@ -12,10 +12,11 @@ public interface ManufacturerCertificateRepository extends JpaRepository<Manufac
     ManufacturerCertificate getManufacturerCertificateByManufacturer_ManuftId (String manuftId);
 
     List<ManufacturerCertificate> getManufacturerCertificatesByMnCertStatusEquals (String mnCertStatus);
+    List<ManufacturerCertificate> getManufacturerCertificatesByMnCertStatusEqualsAndManufacturer_User_Username (String mnCertStatus, String username);
 
     @Query(value = "SELECT * FROM manufacturer_certificates mfc WHERE " +
-            "mfc.manuft_id = (SELECT mn.manuft_id FROM manufacturers mn WHERE mn.username = ?1) AND mfc.mn_cert_status = ?2 " +
-            "ORDER BY mfc.mn_cert_id DESC LIMIT 1", nativeQuery = true)
+            "mfc.manuftId = (SELECT mn.manuftId FROM manufacturers mn WHERE mn.username = ?1) AND mfc.mnCertStatus = ?2 " +
+            "ORDER BY mfc.mnCertId DESC LIMIT 1", nativeQuery = true)
     ManufacturerCertificate getLatestManufacturerCertificateByManufacturerUsername (String username,String status);
 
     List<ManufacturerCertificate> getManufacturerCertificateByManufacturer_User_Username (String username);

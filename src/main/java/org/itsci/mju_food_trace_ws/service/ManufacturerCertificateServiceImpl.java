@@ -101,7 +101,8 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
 
     @Override
     public boolean hasMnCertWaitToAccept(String username) {
-        List<ManufacturerCertificate> manufacturerCertificates = manufacturerCertificateRepository.getManufacturerCertificatesByMnCertStatusEquals("รอการอนุมัติ");
+        List<ManufacturerCertificate> manufacturerCertificates = manufacturerCertificateRepository.getManufacturerCertificatesByMnCertStatusEqualsAndManufacturer_User_Username("รอการอนุมัติ", username);
+        System.out.println("WAIT TO ACCEPT SIZE : " + manufacturerCertificates.size());
         return manufacturerCertificates.size() > 0;
     }
 

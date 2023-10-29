@@ -92,7 +92,8 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
 
     @Override
     public boolean hasFmCertWaitToAccept(String username) {
-        List<FarmerCertificate> farmerCertificates = farmerCertificateRepository.getFarmerCertificatesByFmCertStatusEquals("รอการอนุมัติ");
+        List<FarmerCertificate> farmerCertificates = farmerCertificateRepository.getFarmerCertificatesByFmCertStatusEqualsAndFarmer_User_Username("รอการอนุมัติ", username);
+        System.out.println("WAIT TO ACCEPT SIZE : " + farmerCertificates.size());
         return farmerCertificates.size() > 0;
     }
 

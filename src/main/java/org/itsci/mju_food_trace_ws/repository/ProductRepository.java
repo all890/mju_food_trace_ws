@@ -10,7 +10,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     List<Product> getProductsByManufacturer_User_Username (String username);
 
-    @Query(value = "SELECT p.product_id FROM products p ORDER BY p.product_id DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT p.productId FROM products p ORDER BY p.productId DESC LIMIT 1", nativeQuery = true)
     String getMaxProductId ();
 
 }

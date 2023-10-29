@@ -12,6 +12,6 @@ public interface PlantingRepository extends JpaRepository<Planting, String> {
     List<Planting> getPlantingsByFarmerCertificate_Farmer_User_Username (String farmerId);
     boolean existsByPlantingImg (String plantingImg);
 
-    @Query(value = "SELECT p.planting_id FROM plantings p ORDER BY p.planting_id DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT p.plantingId FROM plantings p ORDER BY p.plantingId DESC LIMIT 1", nativeQuery = true)
     String getMaxPlantingId();
 }

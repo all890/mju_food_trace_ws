@@ -12,10 +12,11 @@ public interface FarmerCertificateRepository extends JpaRepository<FarmerCertifi
     FarmerCertificate getFarmerCertificateByFarmer_FarmerId (String farmerId);
 
     List<FarmerCertificate> getFarmerCertificatesByFmCertStatusEquals (String fmCertStatus);
+    List<FarmerCertificate> getFarmerCertificatesByFmCertStatusEqualsAndFarmer_User_Username (String fmCertStatus, String username);
 
     @Query(value = "SELECT * FROM farmer_certificates fmc WHERE " +
-            "fmc.farmer_id = (SELECT fm.farmer_id FROM farmers fm WHERE fm.username = ?1) AND fmc.fm_cert_status = ?2 " +
-            "ORDER BY fmc.fm_cert_id DESC LIMIT 1", nativeQuery = true)
+            "fmc.farmerId = (SELECT fm.farmerId FROM farmers fm WHERE fm.username = ?1) AND fmc.fmCertStatus = ?2 " +
+            "ORDER BY fmc.fmCertId DESC LIMIT 1", nativeQuery = true)
     FarmerCertificate getLatestFarmerCertificateByFarmerUsername (String username, String status);
 
     List<FarmerCertificate> getFarmerCertificatesByFarmer_User_Username (String username);

@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface QRCodeRepository extends JpaRepository<QRCode, String> {
 
-    @Query(value = "SELECT qr.qrcode_id FROM qr_codes qr ORDER BY qr.qrcode_id DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT qr.qrcodeId FROM qr_codes qr ORDER BY qr.qrcodeId DESC LIMIT 1", nativeQuery = true)
     String getMaxQRCodeId ();
 
 }

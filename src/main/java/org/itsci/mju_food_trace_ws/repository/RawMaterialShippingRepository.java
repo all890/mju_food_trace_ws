@@ -12,7 +12,7 @@ public interface RawMaterialShippingRepository extends JpaRepository<RawMaterial
     List<RawMaterialShipping> getRawMaterialShippingsByManufacturer_User_Username (String username);
     List<RawMaterialShipping> getRawMaterialShippingsByPlanting_FarmerCertificate_Farmer_User_Username (String username);
 
-    @Query(value = "SELECT rms.raw_mat_shp_id FROM raw_material_shippings rms ORDER BY rms.raw_mat_shp_id DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT rms.rawMatShpId FROM raw_material_shippings rms ORDER BY rms.rawMatShpId DESC LIMIT 1", nativeQuery = true)
     String getMaxRawMaterialShippingId();
 
     List<RawMaterialShipping> getRawMaterialShippingsByPlanting_PlantingId (String plantingId);
