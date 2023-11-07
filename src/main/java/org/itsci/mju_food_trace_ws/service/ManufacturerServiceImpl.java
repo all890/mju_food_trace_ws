@@ -8,6 +8,7 @@ import org.itsci.mju_food_trace_ws.model.ManufacturerCertificate;
 import org.itsci.mju_food_trace_ws.model.User;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerCertificateRepository;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerRepository;
+import org.itsci.mju_food_trace_ws.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,15 +50,29 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     public Manufacturer updateMnRegistStatus(String manuftId) throws NoSuchAlgorithmException, JsonProcessingException {
         Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
         manufacturer.setManuftRegStatus("อนุมัติ");
-        manufacturerCertificateService.updateMnCertRegistStatus(manuftId);
+
+        User mnUser = manufacturer.getUser();
+        manufacturer.setUser(null);
+        String mnCurrBlockHash = HashUtil.hashSHA256(manufacturer);
+        manufacturer.setUser(mnUser);
+        manufacturer.setMnCurrBlockHash(mnCurrBlockHash);
+
+        manufacturerCertificateService.updateMnCertRegistStatus(manuftId, mnCurrBlockHash);
         return manufacturerRepository.save(manufacturer);
     }
 
     @Override
-    public Manufacturer declineMnRegistStatus(String manuftId) {
+    public Manufacturer declineMnRegistStatus(String manuftId) throws NoSuchAlgorithmException, JsonProcessingException {
         Manufacturer manufacturer = manufacturerRepository.getReferenceById(manuftId);
         manufacturer.setManuftRegStatus("ไม่อนุมัติ");
-        manufacturerCertificateService.declineMnCertRegistStatus(manuftId);
+
+        User mnUser = manufacturer.getUser();
+        manufacturer.setUser(null);
+        String mnCurrBlockHash = HashUtil.hashSHA256(manufacturer);
+        manufacturer.setUser(mnUser);
+        manufacturer.setMnCurrBlockHash(mnCurrBlockHash);
+
+        manufacturerCertificateService.declineMnCertRegistStatus(manuftId, mnCurrBlockHash);
         return manufacturerRepository.save(manufacturer);
     }
 
@@ -94,7 +109,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
         String factorySupName = map.get("factorySupName");
         String factorySupLastname = map.get("factorySupLastname");
 
-        manufacturer = new Manufacturer(manuftId, manuftName, manuftEmail, manuftRegDate, manuftRegStatus, factoryLatitude, factoryLongitude, factoryTelNo, factorySupName, factorySupLastname, user);
+        manufacturer = new Manufacturer(manuftId, manuftName, manuftEmail, manuftRegDate, manuftRegStatus, factoryLatitude, factoryLongitude, factoryTelNo, factorySupName, factorySupLastname, "0", null, user);
 
         //Manufacturer certificate session
         String mnCertId = manufacturerCertificateService.generateManufacturerCertificateId(manufacturerCertificateRepository.count() + 1);
@@ -110,7 +125,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
 
         String mnCertStatus = "รอการอนุมัติครั้งแรก";
 
-        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, manufacturer);
+        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, null, null, manufacturer);
 
         manufacturerCertificateService.saveManufacturerCertificate(manufacturerCertificate);
 

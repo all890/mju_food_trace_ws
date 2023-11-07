@@ -22,6 +22,8 @@ public interface RawMaterialShippingService {
     String testGetHash (String rawMatShpId) throws NoSuchAlgorithmException, JsonProcessingException;
 
     RawMaterialShipping acceptRawMaterialShipping (String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException;
+    boolean isChainBeforeRmsValid (Map<String, String> map) throws NoSuchAlgorithmException, JsonProcessingException;
+    boolean isChainBeforeAcceptRmsValid (String rawMatShpId) throws NoSuchAlgorithmException, JsonProcessingException;
 
     RawMaterialShipping declineRawMaterialShipping (String rawMatShpId) throws JsonProcessingException, NoSuchAlgorithmException;
 }

@@ -16,7 +16,7 @@ public interface ManufacturerService {
     List<Manufacturer> getManufacturersByRegistStat();
     Manufacturer getManufacturerById(String manuftId);
     Manufacturer updateMnRegistStatus(String manuftId) throws NoSuchAlgorithmException, JsonProcessingException;
-    Manufacturer declineMnRegistStatus(String manuftId);
+    Manufacturer declineMnRegistStatus(String manuftId) throws NoSuchAlgorithmException, JsonProcessingException;
     ManufacturerCertificate getManufacturerDetails(String manuftId);
     Manufacturer saveManufacturer(Map<String, String> map) throws ParseException, JsonProcessingException, NoSuchAlgorithmException;
     Manufacturer updateManufacturer(Manufacturer manufacturer);

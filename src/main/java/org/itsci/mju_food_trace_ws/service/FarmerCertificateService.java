@@ -20,8 +20,8 @@ public interface FarmerCertificateService {
     String uploadFarmerCertificate (MultipartFile file) throws IOException;
     Path downloadFarmerCertificate(String filePath);
     String generateFarmerCertificateId (long rawId);
-    FarmerCertificate updateFmCertRegistStatus(String farmerId) throws JsonProcessingException, NoSuchAlgorithmException;
-    FarmerCertificate updateFmCertRegistStatusDecline(String farmerId);
+    FarmerCertificate updateFmCertRegistStatus(String farmerId, String fmCurrBlockHash) throws JsonProcessingException, NoSuchAlgorithmException;
+    FarmerCertificate updateFmCertRegistStatusDecline(String farmerId, String fmCurrBlockHash) throws NoSuchAlgorithmException, JsonProcessingException;
     FarmerCertificate updateFmRenewingRequetCertStatus(String fmCertId) throws JsonProcessingException, NoSuchAlgorithmException;
     FarmerCertificate declineFmRenewingRequetCertStatus(String fmCertId);
     FarmerCertificate getLatestFarmerCertificateByFarmerUsername(String username);
@@ -30,4 +30,6 @@ public interface FarmerCertificateService {
     List<FarmerCertificate> getFmCertsByFarmerUsername (String username);
 
     boolean hasFmCertWaitToAccept (String username);
+
+    boolean isChainValidBeforeFmCert (String username) throws NoSuchAlgorithmException, JsonProcessingException;
 }

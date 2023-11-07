@@ -129,6 +129,20 @@ public class FarmerCertificateController {
         }
     }
 
+    @GetMapping("/ischainvalbeffmcert/{username}")
+    public ResponseEntity isChainValidBeforeFmCert (@PathVariable("username") String username) {
+        try {
+            if (farmerCertificateService.isChainValidBeforeFmCert(username)) {
+                return new ResponseEntity<>("Chain before fm cert is valid", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Chain before fm cert isn't valid", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to validate chain before fm cert", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/haswaittoacceptcert/{username}")
     public ResponseEntity hasFmCertWaitToAccept (@PathVariable("username") String username) {
         try {

@@ -23,6 +23,7 @@ public interface PlantingService {
     Planting updatePlanting(Planting planting);
     Map<String, Double> getRemainNetQtyOfPtsByFarmerUsername (String username);
     void deletePlanting(String plantingId);
+    boolean isChainBeforePlantingValid (String username) throws NoSuchAlgorithmException, JsonProcessingException;
 
     String testGetNewPtCurrBlockHash (String plantingId) throws JsonProcessingException, NoSuchAlgorithmException;
 }

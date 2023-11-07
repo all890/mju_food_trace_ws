@@ -97,6 +97,22 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/ischainbefpdval/{username}")
+    public ResponseEntity isChainBeforeProductValid (@PathVariable("username") String username) {
+        try {
+            boolean isChainValid = productService.isChainBeforeProductValid(username);
+            if (isChainValid) {
+                return new ResponseEntity<>("Chain before product is valid", HttpStatus.OK);
+            } else {
+                System.out.println("HACKED!");
+                return new ResponseEntity<>("Chain before product isn't valid", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to validate chain before product", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping("/testjson")
     public void testJson () throws JsonProcessingException, NoSuchAlgorithmException {
         Product product = productService.getProductById("PD00000001");

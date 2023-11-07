@@ -45,6 +45,10 @@ public class Product {
 
     private int calcium;
 
+    private String pdPrevBlockHash;
+
+    private String pdCurrBlockHash;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "manuftId")
     private Manufacturer manufacturer;

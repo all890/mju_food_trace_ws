@@ -7,6 +7,7 @@ import org.itsci.mju_food_trace_ws.model.FarmerCertificate;
 import org.itsci.mju_food_trace_ws.model.User;
 import org.itsci.mju_food_trace_ws.repository.FarmerCertificateRepository;
 import org.itsci.mju_food_trace_ws.repository.FarmerRepository;
+import org.itsci.mju_food_trace_ws.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,7 +74,7 @@ public class FarmerServiceImpl implements FarmerService {
         String farmLongitude = map.get("farmLongitude");
 
         //Farmer reg status, user must be null before
-        farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, user);
+        farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, "0", null, user);
 
         String fmCertId = farmerCertificateService.generateFarmerCertificateId(farmerCertificateRepository.count() + 1);
         String fmCertImg = map.get("fmCertImg");
@@ -88,7 +89,7 @@ public class FarmerServiceImpl implements FarmerService {
 
         String fmCertStatus = "รอการอนุมัติครั้งแรก";
 
-        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer);
+        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, null, null, farmer);
 
         //farmerCertificate.setFmCertCurrBlockHash(encodedFmCertCurrBlockHash);
 
@@ -107,15 +108,29 @@ public class FarmerServiceImpl implements FarmerService {
     public Farmer updateFmRegistStatus(String farmerId) throws JsonProcessingException, NoSuchAlgorithmException {
         Farmer farmer = farmerRepository.getReferenceById(farmerId);
         farmer.setFarmerRegStatus("อนุมัติ");
-        farmerCertificateService.updateFmCertRegistStatus(farmerId);
+
+        User fmUser = farmer.getUser();
+        farmer.setUser(null);
+        String fmCurrBlockHash = HashUtil.hashSHA256(farmer);
+        farmer.setUser(fmUser);
+        farmer.setFmCurrBlockHash(fmCurrBlockHash);
+
+        farmerCertificateService.updateFmCertRegistStatus(farmerId, fmCurrBlockHash);
         return farmerRepository.save(farmer);
     }
 
     @Override
-    public Farmer declineFmRegistStatus(String farmerId) {
+    public Farmer declineFmRegistStatus(String farmerId) throws NoSuchAlgorithmException, JsonProcessingException {
         Farmer farmer = farmerRepository.getReferenceById(farmerId);
         farmer.setFarmerRegStatus("ไม่อนุมัติ");
-        farmerCertificateService.updateFmCertRegistStatusDecline(farmerId);
+
+        User fmUser = farmer.getUser();
+        farmer.setUser(null);
+        String fmCurrBlockHash = HashUtil.hashSHA256(farmer);
+        farmer.setUser(fmUser);
+        farmer.setFmCurrBlockHash(fmCurrBlockHash);
+
+        farmerCertificateService.updateFmCertRegistStatusDecline(farmerId, fmCurrBlockHash);
         return farmerRepository.save(farmer);
     }
 

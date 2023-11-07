@@ -17,4 +17,6 @@ public interface ProductService {
     Map<String, String> getProductExistingByManufacturerUsername (String username);
     void deleteProduct (String productId);
 
+    boolean isChainBeforeProductValid (String username) throws NoSuchAlgorithmException, JsonProcessingException;
+
 }

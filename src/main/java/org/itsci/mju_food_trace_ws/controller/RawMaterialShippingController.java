@@ -155,4 +155,34 @@ public class RawMaterialShippingController {
         }
     }
 
+    @PostMapping("/ischainbefrmsval")
+    public ResponseEntity isChainBeforeRmsValid (@RequestBody Map<String, String> map) {
+        try {
+            boolean isChainValid = rawMaterialShippingService.isChainBeforeRmsValid(map);
+            if (isChainValid) {
+                return new ResponseEntity<>("Chain before rms is valid", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Chain before rms isn't valid", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get planting's details", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/ischainbefaccrmsval/{rawMatShpId}")
+    public ResponseEntity isChainBeforeAcceptRmsValid (@PathVariable("rawMatShpId") String rawMatShpId) {
+        try {
+            boolean isChainValidBeforeAccept = rawMaterialShippingService.isChainBeforeAcceptRmsValid(rawMatShpId);
+            if (isChainValidBeforeAccept) {
+                return new ResponseEntity<>("Chain before accept rms is valid", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Chain before accept rms isn't valid", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get planting's details", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

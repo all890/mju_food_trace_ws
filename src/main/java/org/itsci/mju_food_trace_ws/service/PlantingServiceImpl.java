@@ -6,6 +6,7 @@ import org.itsci.mju_food_trace_ws.model.*;
 import org.itsci.mju_food_trace_ws.repository.FarmerRepository;
 import org.itsci.mju_food_trace_ws.repository.PlantingRepository;
 import org.itsci.mju_food_trace_ws.repository.RawMaterialShippingRepository;
+import org.itsci.mju_food_trace_ws.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -84,17 +85,14 @@ public class PlantingServiceImpl implements PlantingService {
 
         FarmerCertificate farmerCertificate = farmerCertificateService.getLatestFarmerCertificateByFarmerUsername(username);
 
-        planting = new Planting(plantingId,plantName,plantDate,plantingImg,bioextract,approxHarvDate,plantingMethod,netQuantity,netQuantityUnit,squareMeters,squareYards,rai, "0", null,farmerCertificate);
+        planting = new Planting(plantingId,plantName,plantDate,plantingImg,bioextract,approxHarvDate,plantingMethod,netQuantity,netQuantityUnit,squareMeters,squareYards,rai, farmerCertificate.getFmCertCurrBlockHash(), null,farmerCertificate);
 
         User tempUser = planting.getFarmerCertificate().getFarmer().getUser();
         planting.getFarmerCertificate().getFarmer().setUser(null);
 
-        String jsonStr2 = new ObjectMapper().writeValueAsString(planting);
-        MessageDigest digest2 = MessageDigest.getInstance("SHA-256");
-        byte[] hash2 = digest2.digest(jsonStr2.getBytes(StandardCharsets.UTF_8));
-        String encodedPtCurrBlockHash = Base64.getEncoder().encodeToString(hash2);
+        String ptCurrBlockHash = HashUtil.hashSHA256(planting);
 
-        planting.setPtCurrBlockHash(encodedPtCurrBlockHash);
+        planting.setPtCurrBlockHash(ptCurrBlockHash);
         planting.getFarmerCertificate().getFarmer().setUser(tempUser);
 
         return plantingRepository.save(planting);
@@ -155,6 +153,41 @@ public class PlantingServiceImpl implements PlantingService {
         Planting planting = plantingRepository.getReferenceById(plantingId);
         planting.setFarmerCertificate(null);
         plantingRepository.delete(planting);
+    }
+
+    @Override
+    public boolean isChainBeforePlantingValid(String username) throws NoSuchAlgorithmException, JsonProcessingException {
+        FarmerCertificate farmerCertificate = farmerCertificateService.getLatestFarmerCertificateByFarmerUsername(username);
+        User tempFmUser = farmerCertificate.getFarmer().getUser();
+        String oldFmCurrBlockHash = farmerCertificate.getFarmer().getFmCurrBlockHash();
+        farmerCertificate.getFarmer().setUser(null);
+        farmerCertificate.getFarmer().setFmCurrBlockHash(null);
+        String newFmCurrBlockHash = HashUtil.hashSHA256(farmerCertificate.getFarmer());
+        farmerCertificate.getFarmer().setUser(tempFmUser);
+        farmerCertificate.getFarmer().setFmCurrBlockHash(oldFmCurrBlockHash);
+        if (newFmCurrBlockHash.equals(farmerCertificate.getFarmer().getFmCurrBlockHash())) {
+            if (newFmCurrBlockHash.equals(farmerCertificate.getFmCertPrevBlockHash())) {
+                User tempFmCertUser = farmerCertificate.getFarmer().getUser();
+                String oldFmCertCurrBlockHash = farmerCertificate.getFmCertCurrBlockHash();
+                farmerCertificate.setFmCertCurrBlockHash(null);
+                farmerCertificate.getFarmer().setUser(null);
+                String newFmCertCurrBlockHash = HashUtil.hashSHA256(farmerCertificate);
+                farmerCertificate.getFarmer().setUser(tempFmCertUser);
+                farmerCertificate.setFmCertCurrBlockHash(oldFmCertCurrBlockHash);
+                if (newFmCertCurrBlockHash.equals(farmerCertificate.getFmCertCurrBlockHash())) {
+                    return true;
+                } else {
+                    System.out.println("E3");
+                    return false;
+                }
+            } else {
+                System.out.println("E2");
+                return false;
+            }
+        } else {
+            System.out.println("E1");
+            return false;
+        }
     }
 
     @Override

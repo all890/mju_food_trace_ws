@@ -40,6 +40,10 @@ public class Manufacturer {
 
     private String factorySupLastname;
 
+    private String mnPrevBlockHash;
+
+    private String mnCurrBlockHash;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username")
     private User user;

@@ -7,6 +7,7 @@ import org.itsci.mju_food_trace_ws.model.FarmerCertificate;
 import org.itsci.mju_food_trace_ws.model.User;
 import org.itsci.mju_food_trace_ws.repository.FarmerCertificateRepository;
 import org.itsci.mju_food_trace_ws.repository.FarmerRepository;
+import org.itsci.mju_food_trace_ws.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,7 +80,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         // farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, user);
 
 
-        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, farmer);
+        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, "", "", farmer);
 
         //Save farmer certificate data to database by using farmer manager and get result message
         return farmerCertificateRepository.save(farmerCertificate);
@@ -95,6 +96,27 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         List<FarmerCertificate> farmerCertificates = farmerCertificateRepository.getFarmerCertificatesByFmCertStatusEqualsAndFarmer_User_Username("รอการอนุมัติ", username);
         System.out.println("WAIT TO ACCEPT SIZE : " + farmerCertificates.size());
         return farmerCertificates.size() > 0;
+    }
+
+    @Override
+    public boolean isChainValidBeforeFmCert(String username) throws NoSuchAlgorithmException, JsonProcessingException {
+        Farmer farmer = farmerRepository.getFarmerByUser_Username(username);
+
+        User tempFmUser = farmer.getUser();
+        String oldFmCurrBlockHash = farmer.getFmCurrBlockHash();
+
+        farmer.setUser(null);
+        farmer.setFmCurrBlockHash(null);
+
+        String newFmCurrBlockHash = HashUtil.hashSHA256(farmer);
+
+        farmer.setUser(tempFmUser);
+        farmer.setFmCurrBlockHash(oldFmCurrBlockHash);
+
+        System.out.println(newFmCurrBlockHash);
+        System.out.println(oldFmCurrBlockHash);
+
+        return newFmCurrBlockHash.equals(oldFmCurrBlockHash);
     }
 
     @Override
@@ -121,15 +143,31 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
     }
 
     @Override
-    public FarmerCertificate updateFmCertRegistStatus(String farmerId) throws JsonProcessingException, NoSuchAlgorithmException {
+    public FarmerCertificate updateFmCertRegistStatus(String farmerId, String fmCurrBlockHash) throws JsonProcessingException, NoSuchAlgorithmException {
         FarmerCertificate farmerCertificate = farmerCertificateRepository.getFarmerCertificateByFarmer_FarmerId(farmerId);
         farmerCertificate.setFmCertStatus("อนุมัติ");
+
+        User fmCertUser = farmerCertificate.getFarmer().getUser();
+        farmerCertificate.getFarmer().setUser(null);
+        farmerCertificate.setFmCertPrevBlockHash(fmCurrBlockHash);
+        String fmCertCurrBlockHash = HashUtil.hashSHA256(farmerCertificate);
+        farmerCertificate.getFarmer().setUser(fmCertUser);
+        farmerCertificate.setFmCertCurrBlockHash(fmCertCurrBlockHash);
+
         return farmerCertificateRepository.save(farmerCertificate);
     }
     @Override
-    public FarmerCertificate updateFmCertRegistStatusDecline(String farmerId) {
+    public FarmerCertificate updateFmCertRegistStatusDecline(String farmerId, String fmCurrBlockHash) throws NoSuchAlgorithmException, JsonProcessingException {
         FarmerCertificate farmerCertificate = farmerCertificateRepository.getFarmerCertificateByFarmer_FarmerId(farmerId);
         farmerCertificate.setFmCertStatus("ไม่อนุมัติ");
+
+        User fmCertUser = farmerCertificate.getFarmer().getUser();
+        farmerCertificate.getFarmer().setUser(null);
+        farmerCertificate.setFmCertPrevBlockHash(fmCurrBlockHash);
+        String fmCertCurrBlockHash = HashUtil.hashSHA256(farmerCertificate);
+        farmerCertificate.getFarmer().setUser(fmCertUser);
+        farmerCertificate.setFmCertCurrBlockHash(fmCertCurrBlockHash);
+
         return farmerCertificateRepository.save(farmerCertificate);
     }
 

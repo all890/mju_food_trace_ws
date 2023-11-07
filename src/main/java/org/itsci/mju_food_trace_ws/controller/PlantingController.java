@@ -61,6 +61,21 @@ public class PlantingController {
         return image;
     }
 
+    @GetMapping("/ischainbefptval/{username}")
+    public ResponseEntity isChainBeforePlantingValid (@PathVariable("username") String username) {
+        try {
+            boolean isChainValid = plantingService.isChainBeforePlantingValid(username);
+            if (isChainValid) {
+                return new ResponseEntity<>("Chain before planting is valid", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Chain before planting isn't valid", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to get planting's details", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping("/listplantings/{username}")
     public ResponseEntity getListPlantingByFarmerUsername (@PathVariable("username") String username){
         try {

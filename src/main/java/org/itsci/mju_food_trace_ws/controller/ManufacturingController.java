@@ -78,13 +78,43 @@ public class ManufacturingController {
         }
     }
     @RequestMapping("/delete/{manufacturingId}")
-    public  ResponseEntity deletePlanting(@PathVariable("manufacturingId") String manufacturingId){
+    public ResponseEntity deletePlanting(@PathVariable("manufacturingId") String manufacturingId){
         try {
             manufacturingService.deleteManufacturing(manufacturingId);
             return new ResponseEntity<>("Delete manufacturing succeed", HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to delete planting", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/ischainvalbefrecmanuft/{manufacturingId}")
+    public ResponseEntity isChainValidBeforeRecordManufacturing (@PathVariable("manufacturingId") String manufacturingId) {
+        try {
+            boolean isChainValid = manufacturingService.isChainValidBeforeRecordManufacturing(manufacturingId);
+            if (isChainValid) {
+                return new ResponseEntity<>("Chain before record manufacturing is valid", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Chain before record manufacturing isn't valid", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to validate chain before record manufacturing", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/ischainvalbefmanuft")
+    public ResponseEntity isChainValidBeforeManufacturing (@RequestBody Map<String, String> map) {
+        try {
+            boolean isChainValid = manufacturingService.isChainValidBeforeManufacturing(map);
+            if (isChainValid) {
+                return new ResponseEntity<>("Chain before manufacturing is valid", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Chain before manufacturing isn't valid", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to validate chain before manufacturing", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

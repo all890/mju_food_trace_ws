@@ -2,13 +2,11 @@ package org.itsci.mju_food_trace_ws.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.itsci.mju_food_trace_ws.model.Manufacturer;
-import org.itsci.mju_food_trace_ws.model.Manufacturing;
-import org.itsci.mju_food_trace_ws.model.Planting;
-import org.itsci.mju_food_trace_ws.model.Product;
+import org.itsci.mju_food_trace_ws.model.*;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerRepository;
 import org.itsci.mju_food_trace_ws.repository.ManufacturingRepository;
 import org.itsci.mju_food_trace_ws.repository.ProductRepository;
+import org.itsci.mju_food_trace_ws.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -76,7 +74,14 @@ public class ProductServiceImpl implements ProductService {
         int calcium = Integer.parseInt(map.get("calcium"));
 
         Product product = new Product(productId, productName, netVolume, netEnergy, saturatedFat, cholesterol,
-                protein, sodium, fiber, sugar, vitA, vitB1, vitB2, iron, calcium, manufacturer);
+                protein, sodium, fiber, sugar, vitA, vitB1, vitB2, iron, calcium, manufacturer.getMnCurrBlockHash(), null, manufacturer);
+
+        User tempMnUser = product.getManufacturer().getUser();
+        product.getManufacturer().setUser(null);
+        String pdCurrBlockHash = HashUtil.hashSHA256(product);
+        product.getManufacturer().setUser(tempMnUser);
+
+        product.setPdCurrBlockHash(pdCurrBlockHash);
 
         return productRepository.save(product);
     }
@@ -109,6 +114,23 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.getReferenceById(productId);
         product.setManufacturer(null);
         productRepository.delete(product);
+    }
+
+    @Override
+    public boolean isChainBeforeProductValid(String username) throws NoSuchAlgorithmException, JsonProcessingException {
+        Manufacturer manufacturer = manufacturerRepository.getManufacturerByUser_Username(username);
+
+        User tempMnUser = manufacturer.getUser();
+        String oldMnCurrBlockHash = manufacturer.getMnCurrBlockHash();
+        manufacturer.setMnCurrBlockHash(null);
+        manufacturer.setUser(null);
+
+        String newMnCurrBlockHash = HashUtil.hashSHA256(manufacturer);
+
+        manufacturer.setMnCurrBlockHash(oldMnCurrBlockHash);
+        manufacturer.setUser(tempMnUser);
+
+        return newMnCurrBlockHash.equals(oldMnCurrBlockHash);
     }
 
     public String generateProductId (long rawId) {

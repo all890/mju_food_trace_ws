@@ -129,4 +129,18 @@ public class ManufacturerCertificateController {
         }
     }
 
+    @GetMapping("/ischainvalbefmncert/{username}")
+    public ResponseEntity isChainValidBeforeMnCert (@PathVariable("username") String username) {
+        try {
+            if (manufacturerCertificateService.isChainBeforeMnCertValid(username)) {
+                return new ResponseEntity<>("Chain before mn cert is valid", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Chain before mn cert isn't valid", HttpStatus.CONFLICT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Failed to validate chain before mn cert", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

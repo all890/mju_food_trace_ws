@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itsci.mju_food_trace_ws.model.*;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerCertificateRepository;
 import org.itsci.mju_food_trace_ws.repository.ManufacturerRepository;
+import org.itsci.mju_food_trace_ws.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,16 +34,32 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
     private ManufacturerRepository manufacturerRepository;
 
     @Override
-    public ManufacturerCertificate updateMnCertRegistStatus(String manuftId) throws JsonProcessingException, NoSuchAlgorithmException {
+    public ManufacturerCertificate updateMnCertRegistStatus(String manuftId, String mnCurrBlockHash) throws JsonProcessingException, NoSuchAlgorithmException {
         ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getManufacturerCertificateByManufacturer_ManuftId(manuftId);
         manufacturerCertificate.setMnCertStatus("อนุมัติ");
+
+        User mnCertUser = manufacturerCertificate.getManufacturer().getUser();
+        manufacturerCertificate.getManufacturer().setUser(null);
+        manufacturerCertificate.setMnCertPrevBlockHash(mnCurrBlockHash);
+        String mnCertCurrBlockHash = HashUtil.hashSHA256(manufacturerCertificate);
+        manufacturerCertificate.getManufacturer().setUser(mnCertUser);
+        manufacturerCertificate.setMnCertCurrBlockHash(mnCertCurrBlockHash);
+
         return manufacturerCertificateRepository.save(manufacturerCertificate);
     }
 
     @Override
-    public ManufacturerCertificate declineMnCertRegistStatus(String manuftId) {
+    public ManufacturerCertificate declineMnCertRegistStatus(String manuftId, String mnCurrBlockHash) throws NoSuchAlgorithmException, JsonProcessingException {
         ManufacturerCertificate manufacturerCertificate = manufacturerCertificateRepository.getManufacturerCertificateByManufacturer_ManuftId(manuftId);
         manufacturerCertificate.setMnCertStatus("ไม่อนุมัติ");
+
+        User mnCertUser = manufacturerCertificate.getManufacturer().getUser();
+        manufacturerCertificate.getManufacturer().setUser(null);
+        manufacturerCertificate.setMnCertPrevBlockHash(mnCurrBlockHash);
+        String mnCertCurrBlockHash = HashUtil.hashSHA256(manufacturerCertificate);
+        manufacturerCertificate.getManufacturer().setUser(mnCertUser);
+        manufacturerCertificate.setMnCertCurrBlockHash(mnCertCurrBlockHash);
+
         return manufacturerCertificateRepository.save(manufacturerCertificate);
     }
 
@@ -88,7 +105,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         Manufacturer manufacturer = manufacturerRepository.getManufacturerByUser_Username(username);
         String mnCertStatus = "รอการอนุมัติ";
 
-        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, manufacturer);
+        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, "", "", manufacturer);
 
         //Save manufacturer certificate data to database by using farmer manager and get result message
         return manufacturerCertificateRepository.save(manufacturerCertificate);
@@ -104,6 +121,24 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         List<ManufacturerCertificate> manufacturerCertificates = manufacturerCertificateRepository.getManufacturerCertificatesByMnCertStatusEqualsAndManufacturer_User_Username("รอการอนุมัติ", username);
         System.out.println("WAIT TO ACCEPT SIZE : " + manufacturerCertificates.size());
         return manufacturerCertificates.size() > 0;
+    }
+
+    @Override
+    public boolean isChainBeforeMnCertValid(String username) throws NoSuchAlgorithmException, JsonProcessingException {
+        Manufacturer manufacturer = manufacturerRepository.getManufacturerByUser_Username(username);
+
+        User tempMnUser = manufacturer.getUser();
+        String oldMnCurrBlockHash = manufacturer.getMnCurrBlockHash();
+
+        manufacturer.setUser(null);
+        manufacturer.setMnCurrBlockHash(null);
+
+        String newMnCurrBlockHash = HashUtil.hashSHA256(manufacturer);
+
+        manufacturer.setUser(tempMnUser);
+        manufacturer.setMnCurrBlockHash(oldMnCurrBlockHash);
+
+        return newMnCurrBlockHash.equals(oldMnCurrBlockHash);
     }
 
     @Override

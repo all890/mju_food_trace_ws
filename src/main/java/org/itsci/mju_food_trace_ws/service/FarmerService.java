@@ -17,7 +17,7 @@ public interface FarmerService {
     Farmer saveFarmer(Map<String, String> map) throws ParseException, NoSuchAlgorithmException, JsonProcessingException;
     Farmer updateFarmer(Farmer farmer);
     Farmer updateFmRegistStatus(String farmerId) throws JsonProcessingException, NoSuchAlgorithmException;
-    Farmer declineFmRegistStatus(String farmerId);
+    Farmer declineFmRegistStatus(String farmerId) throws NoSuchAlgorithmException, JsonProcessingException;
     FarmerCertificate getFarmerDetails(String farmerId);
     void deleteFarmer(String farmerId);
 

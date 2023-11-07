@@ -21,4 +21,8 @@ public interface ManufacturingService {
     Manufacturing recordManufacturing (String manufacturingId) throws JsonProcessingException, NoSuchAlgorithmException;
     List<Manufacturing> getListAllManufacturingByUsername(String username);
 
+    boolean isChainValidBeforeManufacturing (Map<String, String> map) throws NoSuchAlgorithmException, JsonProcessingException;
+
+    boolean isChainValidBeforeRecordManufacturing (String manufacturingId) throws NoSuchAlgorithmException, JsonProcessingException;
+
 }
