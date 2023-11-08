@@ -105,7 +105,7 @@ public class ManufacturerCertificateServiceImpl implements ManufacturerCertifica
         Manufacturer manufacturer = manufacturerRepository.getManufacturerByUser_Username(username);
         String mnCertStatus = "รอการอนุมัติ";
 
-        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, "", "", manufacturer);
+        manufacturerCertificate = new ManufacturerCertificate(mnCertId, mnCertImg, mnCertUploadDate, mnCertNo, mnCertRegDate, mnCertExpireDate, mnCertStatus, null, null, manufacturer);
 
         //Save manufacturer certificate data to database by using farmer manager and get result message
         return manufacturerCertificateRepository.save(manufacturerCertificate);

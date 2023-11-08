@@ -80,7 +80,7 @@ public class FarmerCertificateServiceImpl implements FarmerCertificateService {
         // farmer = new Farmer(farmerId, farmerName, farmerLastname, farmerEmail, farmerMobileNo, farmerRegDate, farmerRegStatus, farmName, farmLatitude, farmLongitude, user);
 
 
-        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, "", "", farmer);
+        farmerCertificate = new FarmerCertificate(fmCertId, fmCertImg, fmCertUploadDate, fmCertNo, fmCertRegDate, fmCertExpireDate, fmCertStatus, null, null, farmer);
 
         //Save farmer certificate data to database by using farmer manager and get result message
         return farmerCertificateRepository.save(farmerCertificate);
